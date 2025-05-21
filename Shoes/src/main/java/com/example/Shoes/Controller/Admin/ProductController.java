@@ -60,6 +60,6 @@ public class ProductController {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Đã xóa sản phẩm thành công");
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.noContent().build();
     }
 }

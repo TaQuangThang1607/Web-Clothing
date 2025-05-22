@@ -2,6 +2,7 @@ package com.example.Shoes.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -16,5 +17,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*") // Cho phép tất cả header
                 .allowCredentials(true) // Cho phép gửi cookie hoặc thông tin xác thực
                 .maxAge(3600); // Thời gian cache CORS preflight request
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/images/product/**")
+                .addResourceLocations("file:images/product/");
     }
 }

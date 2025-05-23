@@ -55,15 +55,17 @@ export async function updateProduct(id: number, formData: FormData): Promise<Pro
   const res = await fetch(`${API_URL}/${id}`, {
     method: 'PATCH',
     body: formData,
+    credentials: 'include',
     next: { revalidate: 0 },
   });
 
   if (!res.ok) {
     const errorData = await res.json();
     if (errorData.errors) {
-      const errorMessages = errorData.errors.map((err: any) => `${err.field}: ${err.message}`).join(', ');
-      throw new Error(errorMessages);
+        const errorMessages = errorData.errors.map((err: any) => `${err.field}: ${err.message}`).join(', ');
+        throw new Error(errorMessages);
     }
+
     throw new Error(errorData.message || 'Lỗi khi cập nhật sản phẩm');
   }
 

@@ -91,11 +91,19 @@ public class ProductController {
                     return errorMap;
                 })
                 .collect(Collectors.toList());
-            return ResponseEntity.badRequest().body(new HashMap<>().put("errors", errors));
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("errors", errors);
+
+            return ResponseEntity.badRequest().body(errorResponse);
         }
-        Product product = productService.handleUpdateProduct(dto, image, id);
-        return ResponseEntity.ok(product);
+
+        // Gọi service cập nhật
+        Product updatedProduct = productService.handleUpdateProduct(dto, image,id);
+
+        return ResponseEntity.ok(updatedProduct);
     }
+
 
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Object> deleteProduct(@PathVariable Long id) {

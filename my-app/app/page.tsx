@@ -1,9 +1,20 @@
 import Image from "next/image";
+import Carousel from "./components/Carousel";
+import Featurs from "./components/Featurs";
+import BestProduct from "./components/BestProduct";
 
 export default function Home() {
   return (
-    <div className="bg-blue-500 text-white p-4 rounded-lg hover:bg-sky-700">
-      Tailwind da hoat dong
-    </div>
+    <>
+        <Carousel />
+        <div className="w-full">
+            <Featurs />
+        </div>
+
+        <div className="w-full">
+          <BestProduct />
+        </div>
+    
+    </>
   );
 }

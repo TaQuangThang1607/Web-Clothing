@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "./components/Header";
-import FooterPage from "./components/Footer";
+
 
 export const metadata: Metadata = {
   title: "Shoes Online Store",
@@ -24,12 +23,10 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
 
-        <Header />
 
-        <main className="pt-20">
+        <main className="">
           {children}
         </main>
-        <FooterPage />
       </body>
     </html>
   );

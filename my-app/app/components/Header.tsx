@@ -23,7 +23,8 @@ export default function Header() {
 
         {/* Navigation */}
         <nav className={`flex-col lg:flex-row lg:flex ${isMenuOpen ? 'flex' : 'hidden'} lg:items-center gap-6`}>
-          <a href="#" className="hover:text-primary text-black">Home</a>
+          <a href="/" className="hover:text-primary text-black">Home</a>
+          <a href="/products" className="hover:text-primary text-black">Products</a>
           <a href="#" className="hover:text-primary text-black">Men</a>
           <a href="#" className="hover:text-primary text-black">Women</a>
 
@@ -46,9 +47,8 @@ export default function Header() {
 
         {/* Icons */}
         <div className="hidden lg:flex items-center gap-4">
-          <a href="#" className="text-gray-700">👤</a>
-          <a href="#" className="text-gray-700">🛒</a>
-          <a href="#" className="text-gray-700">🔍</a>
+          <a href="#" className="text-gray-700">Login</a>
+          <a href="#" className="text-gray-700">Cart</a>
         </div>
       </div>
     </header>

@@ -25,4 +25,6 @@ public class ProductDTO {
     @NotNull(message = "Price is mandatory")
     @Positive(message = "Price must be positive")
     private Double price;
+
+    private String brand;
 }

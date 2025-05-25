@@ -237,69 +237,121 @@ function ProductTable({ products, currentPage, totalPages, onPageChange }) {
 
 var { g: global, __dirname } = __turbopack_context__;
 {
+// services/productService.ts
 __turbopack_context__.s({
     "createProduct": (()=>createProduct),
+    "deleteProduct": (()=>deleteProduct),
     "getAllProducts": (()=>getAllProducts),
     "getProductById": (()=>getProductById),
     "updateProduct": (()=>updateProduct)
 });
 const API_URL = 'http://localhost:8080/admin/products';
 async function getAllProducts(page = 0, size = 10) {
-    const res = await fetch(`${API_URL}?page=${page}&size=${size}`, {
-        method: 'GET',
-        next: {
-            revalidate: 0
+    try {
+        const res = await fetch(`${API_URL}?page=${page}&size=${size}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            next: {
+                revalidate: 0
+            }
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to fetch products');
         }
-    });
-    if (!res.ok) {
-        throw new Error('Lỗi khi lấy danh sách sản phẩm');
+        return res.json();
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        throw error;
     }
-    return res.json();
-}
-async function createProduct(formData) {
-    const res = await fetch(API_URL, {
-        method: 'POST',
-        body: formData,
-        next: {
-            revalidate: 0
-        }
-    });
-    if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Lỗi khi tạo sản phẩm');
-    }
-    return res.json();
 }
 async function getProductById(id) {
-    const res = await fetch(`${API_URL}/${id}`, {
-        method: 'GET',
-        next: {
-            revalidate: 0
+    try {
+        const res = await fetch(`${API_URL}/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            next: {
+                revalidate: 0
+            }
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || `Failed to fetch product with id ${id}`);
         }
-    });
-    if (!res.ok) {
-        throw new Error(`Lỗi khi lấy thông tin sản phẩm: ${res.statusText}`);
+        return res.json();
+    } catch (error) {
+        console.error(`Error fetching product with id ${id}:`, error);
+        throw error;
     }
-    return res.json();
 }
-async function updateProduct(id, formData) {
-    const res = await fetch(`${API_URL}/${id}`, {
-        method: 'PATCH',
-        body: formData,
-        credentials: 'include',
-        next: {
-            revalidate: 0
+async function createProduct(productData) {
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            body: productData,
+            // Không đặt Content-Type header khi sử dụng FormData
+            // Browser sẽ tự động thiết lập với boundary
+            next: {
+                revalidate: 0
+            }
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to create product');
         }
-    });
-    if (!res.ok) {
-        const errorData = await res.json();
-        if (errorData.errors) {
-            const errorMessages = errorData.errors.map((err)=>`${err.field}: ${err.message}`).join(', ');
-            throw new Error(errorMessages);
-        }
-        throw new Error(errorData.message || 'Lỗi khi cập nhật sản phẩm');
+        return res.json();
+    } catch (error) {
+        console.error('Error creating product:', error);
+        throw error;
     }
-    return res.json();
+}
+async function updateProduct(id, productData) {
+    try {
+        const res = await fetch(`${API_URL}/${id}`, {
+            method: 'PATCH',
+            body: productData,
+            // Không đặt Content-Type header khi sử dụng FormData
+            credentials: 'include',
+            next: {
+                revalidate: 0
+            }
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            if (errorData.errors) {
+                // Xử lý lỗi validation từ server
+                const errorMessages = errorData.errors.map((err)=>`${err.field}: ${err.message}`).join(', ');
+                throw new Error(errorMessages);
+            }
+            throw new Error(errorData.message || `Failed to update product with id ${id}`);
+        }
+        return res.json();
+    } catch (error) {
+        console.error(`Error updating product with id ${id}:`, error);
+        throw error;
+    }
+}
+async function deleteProduct(id) {
+    try {
+        const res = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            next: {
+                revalidate: 0
+            }
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || `Failed to delete product with id ${id}`);
+        }
+    } catch (error) {
+        console.error(`Error deleting product with id ${id}:`, error);
+        throw error;
+    }
 }
 }}),
 "[project]/app/admin/products/page.tsx [app-ssr] (ecmascript)": ((__turbopack_context__) => {

@@ -18,4 +18,5 @@ public class Product {
     private String size;
     private String color;
     private String imageUrl;
+    private String brand;
 }

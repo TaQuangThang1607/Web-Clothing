@@ -25,7 +25,7 @@ export default function Login() {
                   type="text" 
                   name="email" 
                   placeholder="Email" 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
                 <span className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -42,7 +42,7 @@ export default function Login() {
                   type="password" 
                   name="pass" 
                   placeholder="Password" 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
                 <span className="absolute inset-y-0 right-0 flex items-center pr-3">

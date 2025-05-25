@@ -10,7 +10,7 @@ export default function Header() {
       <div className="container mx-auto flex justify-between items-center p-4">
         {/* Logo */}
         <a href="/" className="text-xl font-bold text-primary">
-          <img src="/images/main-logo.png" alt="Logo" className="h-10" />
+          <img src="https://themewagon.github.io/stylish/images/main-logo.png" alt="Logo" className="h-10" />
         </a>
 
         {/* Hamburger menu (mobile) */}
@@ -25,8 +25,7 @@ export default function Header() {
         <nav className={`flex-col lg:flex-row lg:flex ${isMenuOpen ? 'flex' : 'hidden'} lg:items-center gap-6`}>
           <a href="/" className="hover:text-primary text-black">Home</a>
           <a href="/products" className="hover:text-primary text-black">Products</a>
-          <a href="#" className="hover:text-primary text-black">Men</a>
-          <a href="#" className="hover:text-primary text-black">Women</a>
+          
 
           {/* Dropdown Example */}
           <div className="relative">

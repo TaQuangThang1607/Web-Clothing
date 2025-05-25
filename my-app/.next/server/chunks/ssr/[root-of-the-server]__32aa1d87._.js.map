@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 39, "column": 0}, "map": {"version":3,"sources":["file:///D:/react%2Bspring/my-app/app/admin/products/page.tsx"],"sourcesContent":["// app/admin/products/page.tsx\r\n'use client'\r\nimport Link from 'next/link'\r\n\r\nexport default function ProductListPage() {\r\n  return (\r\n    <div>\r\n      <h2 className=\"text-xl font-semibold mb-4\">Danh sách sản phẩm</h2>\r\n      {/* Gọi API và hiển thị bảng ở đây */}\r\n      <Link href=\"/admin/products/create\" className=\"text-blue-500 underline\">\r\n        ➕ Thêm sản phẩm mới\r\n      </Link>\r\n    </div>\r\n  )\r\n}\r\n"],"names":[],"mappings":"AAAA,8BAA8B;;;;;AAE9B;AADA;;;AAGe,SAAS;IACtB,qBACE,8OAAC;;0BACC,8OAAC;gBAAG,WAAU;0BAA6B;;;;;;0BAE3C,8OAAC,4JAAA,CAAA,UAAI;gBAAC,MAAK;gBAAyB,WAAU;0BAA0B;;;;;;;;;;;;AAK9E","debugId":null}}]
+}

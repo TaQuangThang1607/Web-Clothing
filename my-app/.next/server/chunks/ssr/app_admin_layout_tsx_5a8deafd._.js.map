@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///D:/react%2Bspring/my-app/app/admin/layout.tsx"],"sourcesContent":["\r\nexport default function AdminLayout({ children }: { children: React.ReactNode }) {\r\n  return (\r\n    <>\r\n      <div className=\"p-6 mt-20\">\r\n        <h1 className=\"text-2xl font-bold mb-6\">Trang quản trị</h1>\r\n        {children}\r\n      </div>\r\n    </>\r\n  );\r\n}"],"names":[],"mappings":";;;;;AACe,SAAS,YAAY,EAAE,QAAQ,EAAiC;IAC7E,qBACE;kBACE,cAAA,8OAAC;YAAI,WAAU;;8BACb,8OAAC;oBAAG,WAAU;8BAA0B;;;;;;gBACvC;;;;;;;;AAIT","debugId":null}}]
+}

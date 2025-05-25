@@ -4,7 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-
+import lombok.Data;
+@Data
 public class ProductDTO {
     @NotBlank(message = "Name is mandatory")
     @Size(max = 100, message = "Name must be less than 100 characters")
@@ -24,57 +25,4 @@ public class ProductDTO {
     @NotNull(message = "Price is mandatory")
     @Positive(message = "Price must be positive")
     private Double price;
-
-    @NotBlank(message = "Image URL is mandatory")
-    @Size(max = 255, message = "Image URL must be less than 255 characters")
-    private String imageUrl;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
 }

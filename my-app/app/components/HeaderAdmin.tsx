@@ -3,8 +3,8 @@ export default function HeaderAdmin() {
   return (
     <nav className="bg-gray-900 text-white flex items-center justify-between px-4 py-2">
       {/* Navbar Brand */}
-      <a href="index.html" className="text-lg font-semibold">
-        Start Bootstrap
+      <a href="/admin" className="text-lg font-semibold">
+        Admin
       </a>
 
       {/* Sidebar Toggle */}

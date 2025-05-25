@@ -12,7 +12,7 @@ interface Props {
 export default function ProductTable({ products, currentPage, totalPages, onPageChange }: Props) {
   return (
     <div>
-      <table className="w-full border-collapse border border-gray-300">
+      <table className="text-black w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
             <th className="border p-2">ID</th>
@@ -40,7 +40,7 @@ export default function ProductTable({ products, currentPage, totalPages, onPage
           ))}
         </tbody>
       </table>
-      <div className="mt-4 flex justify-center space-x-2">
+      <div className="text-black mt-4 flex justify-center space-x-2">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 0}

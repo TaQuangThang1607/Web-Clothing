@@ -7,7 +7,7 @@ export default function DashboardAdmin() {
           <nav className="text-sm text-gray-600 mb-4">
             <ol className="flex space-x-2">
               <li>
-                <a href="index.html" className="text-blue-600 hover:underline">Dashboard</a>
+                <a href="" className="text-blue-600 hover:underline">Dashboard</a>
               </li>
               <li>/</li>
               <li className="text-gray-800">Static Navigation</li>

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -38,6 +37,7 @@ public class ProductService {
         product.setSize(dto.getSize());
         product.setColor(dto.getColor());
         product.setPrice(dto.getPrice());
+        product.setBrand(dto.getBrand());
 
         if (image != null && !image.isEmpty()) {
             try {
@@ -69,6 +69,7 @@ public class ProductService {
         product.setSize(dto.getSize());
         product.setColor(dto.getColor());
         product.setPrice(dto.getPrice());
+        product.setBrand(dto.getBrand());
         // product.setImageUrl(dto.getImageUrl());
 
         if (!image.isEmpty()) {

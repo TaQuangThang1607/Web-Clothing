@@ -1,25 +1,33 @@
 import { Product } from "../types/product"
 import { ProductDTO } from "../types/ProductDTO"
 
-
+//app/services/productService.ts
 const API_URL = 'http://localhost:8080/admin/products'
 //handle get all product
+// app/services/productService.ts
 export async function getAllProducts(page: number = 0, size: number = 10): Promise<{
     products: Product[];
     currentPage: number;
     totalItems: number;
     totalPages: number;
 }> {
-    const res = await fetch(`${API_URL}?page=${page}&size=${size}`, {
-        method: 'GET',
-        next: { revalidate: 0 },
-    });
-
+    const res = await fetch(`${API_URL}?page=${page}&size=${size}`);
+    
     if (!res.ok) {
         throw new Error('Lỗi khi lấy danh sách sản phẩm');
     }
 
-    return res.json();
+    const data = await res.json();
+    
+    // Thêm log để kiểm tra dữ liệu trả về
+    console.log('API Response:', data);
+    
+    return {
+        products: data.content || [],
+        currentPage: data.number || 0,
+        totalItems: data.totalElements || 0,
+        totalPages: data.totalPages || 1
+    };
 }
 
 //handle create product(productService.ts)

@@ -1,7 +1,7 @@
 // components/ProductTable.tsx
 import Link from "next/link";
 import { Product } from "../types/product";
-
+//app/components/ProductTable.tsx
 interface Props {
   products: Product[];
   currentPage: number;

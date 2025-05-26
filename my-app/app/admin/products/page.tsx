@@ -16,22 +16,27 @@ export default function ProductListPage() {
   const [currentPage, setCurrentPage] = useState<number>(parseInt(searchParams.get('page') || '0'));
   const [totalPages, setTotalPages] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchProducts = async () => {
-      setIsLoading(true);
       try {
-        const data = await getAllProducts(currentPage, 10);
-        setProducts(data.products);
+        setIsLoading(true);
+        const data = await getAllProducts(currentPage);
+        setProducts(data.products || []);
         setTotalPages(data.totalPages);
-      } catch (error) {
-        console.error('Lỗi khi lấy sản phẩm:', error);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Lỗi không xác định');
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchProducts();
   }, [currentPage]);
+
+  if (isLoading) return <div>Đang tải...</div>;
+  if (error) return <div>Lỗi: {error}</div>;
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);

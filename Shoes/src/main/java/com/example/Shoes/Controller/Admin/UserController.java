@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.Shoes.Model.dto.UserDTO;
-import com.example.Shoes.Service.UserService;
+import com.example.Shoes.service.UserService;
 import com.example.Shoes.utils.ApiResponse;
 import com.example.Shoes.utils.PagedResponse;
 

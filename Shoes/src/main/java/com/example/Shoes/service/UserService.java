@@ -1,4 +1,4 @@
-package com.example.Shoes.Service;
+package com.example.Shoes.service;
 
 
 import org.springframework.data.domain.Page;

@@ -95,7 +95,7 @@ export default function ListProducts() {
             <Header />
             <div className="bg-white py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-6">Fresh Fruits Shop</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-6">Shoes</h1>
                     <div className="grid grid-cols-1 gap-6">
                         <div className="col-span-1">
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -104,7 +104,7 @@ export default function ListProducts() {
                                         <input 
                                             type="search" 
                                             className="flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                            placeholder="keywords"
+                                            placeholder=""
                                         />
                                         <span className="bg-gray-100 p-3 border border-l-0 border-gray-300 rounded-r-md">
                                             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

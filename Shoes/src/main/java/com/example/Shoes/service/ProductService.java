@@ -1,11 +1,11 @@
-package com.example.Shoes.service;
+package com.example.Shoes.Service;
 
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.Shoes.domain.dto.ProductDTO;
+import com.example.Shoes.Model.dto.ProductDTO;
 
 public interface ProductService {
     Page<ProductDTO> getAllProducts(Pageable pageable);

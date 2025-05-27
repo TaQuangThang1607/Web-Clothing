@@ -15,16 +15,16 @@ interface Props {
 export default function ProductTable({ products, currentPage, totalPages, onPageChange }: Props) {
 
   const handleDelete = async (id: number) => {
-  if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-    try {
-      await deleteProduct(id);
-      onPageChange(currentPage); // Làm mới trang
-      alert('Xóa sản phẩm thành công!');
-    } catch (error) {
-      alert('Lỗi khi xóa sản phẩm');
+    if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+      try {
+        await deleteProduct(id);
+        onPageChange(currentPage); // Làm mới trang
+        alert('Xóa sản phẩm thành công!');
+      } catch (error) {
+        alert('Lỗi khi xóa sản phẩm');
+      }
     }
-  }
-};
+  };
   return (
     <div>
       <table className="w-full border-collapse border border-gray-300 text-black">

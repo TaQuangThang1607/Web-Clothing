@@ -1,6 +1,6 @@
 // services/productService.ts
 import { Product } from "../types/product";
-import { ProductDTO } from "../types/ProductDTO";
+import { ProductDTO } from "../types/dto/ProductDTO";
 
 const API_URL = 'http://localhost:8080/admin/products'
 
@@ -31,9 +31,6 @@ export async function getAllProducts(page: number = 0, size: number = 10): Promi
                 totalPages: 0
             };
         }
-
-
-
         return res.json();
     } catch (error) {
         console.error('Error fetching products:', error);
@@ -88,26 +85,29 @@ export async function createProduct(productData: FormData): Promise<Product> {
 }
 
 // Cập nhật sản phẩm
-export async function updateProduct(id: number, productData: ProductDTO) {
+export async function updateProduct(id: number, productData: ProductDTO, imageFile?: File) {
+    const formData = new FormData();
+    formData.append('product', new Blob([JSON.stringify(productData)], {
+        type: 'application/json'  // Rõ ràng hơn về kiểu dữ liệu
+    }));
+    
+    if (imageFile) {
+        formData.append('image', imageFile);
+    }
+
     const res = await fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(productData),
+        method: 'PATCH',
+        body: formData,
     });
 
     if (!res.ok) {
-        let errorMessage = `Failed to update product with id ${id}`;
-        try {
-            const errorData = await res.json();
-            errorMessage = errorData.message || errorMessage;
-        } catch (_) {}
-        throw new Error(errorMessage);
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.message || `Failed to update product with id ${id}`);
     }
 
     return res.json();
 }
+
 
 export async function updateProductWithImage(id: number, formData: FormData) {
     const res = await fetch(`${API_URL}/${id}/upload`, {

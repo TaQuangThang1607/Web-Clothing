@@ -1,17 +1,17 @@
-package com.example.Shoes.service.impl;
+package com.example.Shoes.Service.impl;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.Shoes.domain.Product;
-import com.example.Shoes.domain.dto.ProductDTO;
-import com.example.Shoes.domain.mapper.ProductMapper;
+import com.example.Shoes.Model.Product;
+import com.example.Shoes.Model.dto.ProductDTO;
+import com.example.Shoes.Model.mapper.ProductMapper;
+import com.example.Shoes.Repository.ProductRepository;
+import com.example.Shoes.Service.FileStorageService;
+import com.example.Shoes.Service.ProductService;
 import com.example.Shoes.exception.ResourceNotFoundException;
-import com.example.Shoes.repository.ProductRepository;
-import com.example.Shoes.service.FileStorageService;
-import com.example.Shoes.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +30,8 @@ public class ProductServiceImpl implements ProductService {
     }
     @Override
     public ProductDTO getProductById(Long id) {
-        return productRepository.findById(id).map(productMapper::toDto).orElseThrow(() -> new RuntimeException("product id not found"));
+        return productRepository.findById(id).map(productMapper::toDto)
+            .orElseThrow(() -> new ResourceNotFoundException("product id not found"));
     }
     @Override
     public ProductDTO createProduct(ProductDTO dto, MultipartFile image) {

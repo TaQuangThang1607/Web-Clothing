@@ -1,10 +1,10 @@
 'use client';
 
 import { getProductById } from '@/app/services/productService';
-import { ProductDTO } from '@/app/types/ProductDTO';
+import { ProductDTO } from '@/app/types/dto/ProductDTO';
 import { useRouter, useParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
-
+// app/admin/products/update/[id]/page.tsx
 export default function UpdateProduct() {
   const router = useRouter();
   const { id } = useParams();
@@ -100,6 +100,7 @@ export default function UpdateProduct() {
         throw new Error('ID sản phẩm không hợp lệ');
       }
 
+      // Validate form data
       if (!formData.name || !formData.size || !formData.color || !formData.brand) {
         throw new Error('Vui lòng điền đầy đủ các trường bắt buộc');
       }
@@ -109,7 +110,8 @@ export default function UpdateProduct() {
       }
 
       const formDataUpload = new FormData();
-      formDataUpload.append('product', JSON.stringify({
+
+      const productBlob = new Blob([JSON.stringify({
         id: formData.id,
         name: formData.name,
         description: formData.description,
@@ -118,7 +120,10 @@ export default function UpdateProduct() {
         price: Number(formData.price),
         brand: formData.brand,
         imageUrl: formData.imageUrl,
-      }));
+      })], { type: 'application/json' });
+
+      formDataUpload.append('product', productBlob);
+
       if (imageFile) {
         formDataUpload.append('image', imageFile);
       }
@@ -251,8 +256,7 @@ export default function UpdateProduct() {
           {imagePreview && (
             <div>
               <p className="block text-sm font-medium text-gray-700">Preview hình ảnh:</p>
-              <img src={imagePreview} alt="Preview" className="mt-2 max-w-xs rounded-md shadow-sm" />
-            </div>
+              <img src={`http://localhost:8080${formData.imageUrl}`} alt="Preview" className="mt-2 max-w-xs rounded-md shadow-sm" />            </div>
           )}
           <button
             type="submit"

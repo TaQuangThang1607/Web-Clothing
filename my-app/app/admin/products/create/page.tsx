@@ -1,28 +1,32 @@
 'use client';
 
 import { createProduct } from "@/app/services/productService";
-import { ProductDTO } from "@/app/types/ProductDTO";
+import { ProductDTO } from "@/app/types/dto/ProductDTO";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 export default function CreateProductPage() {
+    const router = useRouter();
     const [formData, setFormData] = useState<ProductDTO>({
+        id: 0,
         name: '',
         description: '',
         size: '',
         color: '',
         price: 0,
-        imageUrl: '', // Giữ lại để lưu URL từ backend sau khi upload
+        brand: '',
+        imageUrl: '',
     });
-    const [imagePreview, setImagePreview] = useState<string | null>(null); // State để lưu URL preview hình ảnh
-    const [imageFile, setImageFile] = useState<File | null>(null); // State để lưu file hình ảnh
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Xử lý thay đổi input text
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
@@ -30,54 +34,76 @@ export default function CreateProductPage() {
         }));
     };
 
-    // Xử lý chọn file hình ảnh
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (!file.type.startsWith('image/')) {
+                setError('Vui lòng chọn một file hình ảnh hợp lệ (jpg, png, ...).');
+                setImageFile(null);
+                setImagePreview(null);
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                setError('Kích thước file không được vượt quá 5MB.');
+                setImageFile(null);
+                setImagePreview(null);
+                return;
+            }
             setImageFile(file);
-            setImagePreview(URL.createObjectURL(file)); // Tạo URL tạm để preview
+            setImagePreview(URL.createObjectURL(file));
+            setError(null);
         } else {
             setImageFile(null);
             setImagePreview(null);
         }
     };
 
-    // Xử lý submit form
+    // Xử lý submit
     const handleSubmit = async (e: React.FormEvent) => {
-        const router = useRouter();
         e.preventDefault();
         setIsLoading(true);
         try {
             const data = new FormData();
 
-            // Tạo 1 blob JSON từ DTO
-            const jsonBlob = new Blob(
-                [JSON.stringify({
-                    name: formData.name,
-                    description: formData.description,
-                    size: formData.size,
-                    color: formData.color,
-                    price: formData.price
-                })],
-                { type: 'application/json' }
-            );
+            const productPayload = {
+                name: formData.name,
+                description: formData.description,
+                size: formData.size,
+                color: formData.color,
+                price: formData.price,
+                brand: formData.brand,
+                imageUrl: '',
+            };
 
-            // Gắn DTO vào dưới tên dto để match với @RequestPart("product")
+            const jsonBlob = new Blob([JSON.stringify(productPayload)], { type: 'application/json' });
+
             data.append('product', jsonBlob);
 
-            // Gắn ảnh
             if (imageFile) {
                 data.append('image', imageFile);
             }
 
             await createProduct(data);
+
             setSuccess('Tạo sản phẩm thành công');
-            setFormData({ name: '', description: '', size: '', color: '', price: 0, imageUrl: '' });
+            setFormData({
+                id: 0,
+                name: '',
+                description: '',
+                size: '',
+                color: '',
+                price: 0,
+                brand: '',
+                imageUrl: '',
+            });
             setImageFile(null);
             setImagePreview(null);
             setError(null);
-            router.push('/admin/product');
+
+            router.push('/admin/products');
         } catch (error) {
+            console.error(error);
             setError('Lỗi khi tạo sản phẩm. Vui lòng kiểm tra lại.');
             setSuccess(null);
         } finally {
@@ -85,9 +111,8 @@ export default function CreateProductPage() {
         }
     };
 
-
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 text-black">
             <h1 className="text-2xl font-bold mb-4">Tạo Sản Phẩm</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -136,17 +161,41 @@ export default function CreateProductPage() {
                         required
                     />
                 </div>
+
+
                 <div>
-                    <label htmlFor="price" className="block">Giá</label>
-                    <input
-                        type="number"
-                        id="price"
-                        name="price"
-                        value={formData.price}
+                    <label htmlFor="brand" className="block">Thương hiệu</label>
+                    <select
+                        id="brand"
+                        name="brand"
+                        value={formData.brand}
                         onChange={handleChange}
                         className="w-full border p-2"
                         required
-                    />
+                    >
+
+                         <option value="">-- Chọn thương hiệu --</option>
+                        <option value="Nike">Nike</option>
+                        <option value="Adidas">Adidas</option>
+                        <option value="Puma">Puma</option>
+                        <option value="Converse">Converse</option>
+                        <option value="Vans">Vans</option>
+                    </select>
+                </div>
+
+
+                <div>
+                    <label htmlFor="price" className="block">Giá</label>
+                    <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    value={isNaN(formData.price) ? '' : formData.price}
+                    onChange={handleChange}
+                    className="w-full border p-2"
+                    required
+                />
+
                 </div>
                 <div>
                     <label htmlFor="image" className="block">Hình ảnh</label>

@@ -53,11 +53,9 @@ export default function ListProducts() {
 
     const handleBrandFilter = (brand: string) => {
         if (selectedBrand === brand) {
-            // If same brand is clicked again, remove filter
             setSelectedBrand(null)
             setFilteredProducts(products)
         } else {
-            // Filter products by selected brand
             setSelectedBrand(brand)
             const filtered = products.filter(product => product.category === brand)
             setFilteredProducts(filtered)
@@ -191,10 +189,11 @@ export default function ListProducts() {
                                             <div key={product.id} className="relative rounded-lg shadow-md overflow-hidden">
                                                 <div className="relative">
                                                     <img 
-                                                        src={product.imageUrl} 
-                                                        className="w-full h-48 object-cover rounded-t-lg" 
+                                                        src={`http://localhost:8080${product.imageUrl}`} 
                                                         alt={product.name} 
-                                                    />
+                                                        className="w-full h-48 object-cover rounded-t-lg" 
+                                                        />
+
                                                     <div className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded text-sm">
                                                         {product.category || 'Fruits'}
                                                     </div>
@@ -203,7 +202,10 @@ export default function ListProducts() {
                                                     <h4 className="text-lg font-semibold text-gray-900">{product.name}</h4>
                                                     <p className="text-gray-600 text-sm">{product.description}</p>
                                                     <div className="flex justify-between items-center mt-4 flex-wrap">
-                                                        <p className="text-gray-900 font-bold text-lg">${product.price.toFixed(2)} / {product.size}</p>
+                                                        <p className="text-gray-900 font-bold text-lg">{product.price != null && !isNaN(product.price) 
+                                                                                                            ? Number(product.price).toFixed(2) 
+                                                                                                            : 'N/A'} đ
+                                                                                                        / {product.size}</p>
                                                         <a href="#" className="bg-white border border-gray-300 text-blue-500 px-3 py-2 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center">
                                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />

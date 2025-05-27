@@ -1,4 +1,4 @@
-package com.example.Shoes.domain;
+package com.example.Shoes.Model;
 
 import java.io.Serializable;
 

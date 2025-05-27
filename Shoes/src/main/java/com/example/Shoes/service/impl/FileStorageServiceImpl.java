@@ -1,9 +1,10 @@
-package com.example.Shoes.service.impl;
+package com.example.Shoes.Service.impl;
 
-import com.example.Shoes.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.example.Shoes.Service.FileStorageService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,8 +31,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             
             return "/uploads/" + fileName;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store file: " + e.getMessage(), e);
-        }
+            throw new RuntimeException("Failed to store file: " + file.getOriginalFilename(), e);        }
     }
 
     @Override

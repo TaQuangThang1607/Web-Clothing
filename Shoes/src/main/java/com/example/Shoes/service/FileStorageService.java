@@ -1,4 +1,4 @@
-package com.example.Shoes.service;
+package com.example.Shoes.Service;
 
 import org.springframework.web.multipart.MultipartFile;
 

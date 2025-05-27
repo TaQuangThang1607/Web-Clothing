@@ -5,6 +5,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import jakarta.validation.constraints.NotNull;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -19,8 +21,9 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/images/product/**")
-                .addResourceLocations("file:images/product/");
+    public void addResourceHandlers(@NotNull ResourceHandlerRegistry registry) {
+        registry
+                .addResourceHandler("/uploads/**")  
+                .addResourceLocations("file:uploads/");
     }
 }

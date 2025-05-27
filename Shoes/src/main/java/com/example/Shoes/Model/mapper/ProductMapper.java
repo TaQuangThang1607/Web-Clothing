@@ -1,11 +1,11 @@
-package com.example.Shoes.domain.mapper;
+package com.example.Shoes.Model.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.example.Shoes.domain.Product;
-import com.example.Shoes.domain.dto.ProductDTO;
+import com.example.Shoes.Model.Product;
+import com.example.Shoes.Model.dto.ProductDTO;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {

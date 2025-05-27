@@ -1,4 +1,4 @@
-package com.example.Shoes.domain.dto;
+package com.example.Shoes.Model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,5 +29,6 @@ public class ProductDTO {
     @Positive(message = "Price must be positive")
     private Double price;
 
+    private String imageUrl;
     private String brand;
 }

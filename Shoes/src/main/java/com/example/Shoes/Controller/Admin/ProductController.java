@@ -7,8 +7,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.Shoes.domain.dto.ProductDTO;
-import com.example.Shoes.service.ProductService;
+import com.example.Shoes.Model.dto.ProductDTO;
+import com.example.Shoes.Service.ProductService;
 import com.example.Shoes.utils.ApiResponse;
 import com.example.Shoes.utils.PagedResponse;
 

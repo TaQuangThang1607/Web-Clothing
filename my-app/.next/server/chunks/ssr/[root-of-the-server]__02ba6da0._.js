@@ -41,7 +41,7 @@ function ProductTable({ products, currentPage, totalPages, onPageChange }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
-                className: "w-full border-collapse border border-gray-300",
+                className: "w-full border-collapse border border-gray-300 text-black",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -192,7 +192,7 @@ function ProductTable({ products, currentPage, totalPages, onPageChange }) {
                         children: "Trang trước"
                     }, void 0, false, {
                         fileName: "[project]/app/components/ProductTable.tsx",
-                        lineNumber: 44,
+                        lineNumber: 45,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -205,7 +205,7 @@ function ProductTable({ products, currentPage, totalPages, onPageChange }) {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/ProductTable.tsx",
-                        lineNumber: 51,
+                        lineNumber: 52,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -215,13 +215,13 @@ function ProductTable({ products, currentPage, totalPages, onPageChange }) {
                         children: "Trang sau"
                     }, void 0, false, {
                         fileName: "[project]/app/components/ProductTable.tsx",
-                        lineNumber: 54,
+                        lineNumber: 55,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/ProductTable.tsx",
-                lineNumber: 43,
+                lineNumber: 44,
                 columnNumber: 7
             }, this)
         ]
@@ -243,7 +243,8 @@ __turbopack_context__.s({
     "deleteProduct": (()=>deleteProduct),
     "getAllProducts": (()=>getAllProducts),
     "getProductById": (()=>getProductById),
-    "updateProduct": (()=>updateProduct)
+    "updateProduct": (()=>updateProduct),
+    "updateProductWithImage": (()=>updateProductWithImage)
 });
 const API_URL = 'http://localhost:8080/admin/products';
 async function getAllProducts(page = 0, size = 10) {
@@ -257,9 +258,13 @@ async function getAllProducts(page = 0, size = 10) {
                 revalidate: 0
             }
         });
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || 'Failed to fetch products');
+        if (res.status === 204) {
+            return {
+                content: [],
+                page: page,
+                totalElements: 0,
+                totalPages: 0
+            };
         }
         return res.json();
     } catch (error) {
@@ -280,12 +285,11 @@ async function getProductById(id) {
         });
         if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.message || `Failed to fetch product with id ${id}`);
+            throw new Error(errorData.message || `Không thể lấy thông tin sản phẩm với id ${id}`);
         }
         return res.json();
     } catch (error) {
-        console.error(`Error fetching product with id ${id}:`, error);
-        throw error;
+        throw new Error(`Lỗi khi lấy sản phẩm với id `);
     }
 }
 async function createProduct(productData) {
@@ -293,8 +297,6 @@ async function createProduct(productData) {
         const res = await fetch(API_URL, {
             method: 'POST',
             body: productData,
-            // Không đặt Content-Type header khi sử dụng FormData
-            // Browser sẽ tự động thiết lập với boundary
             next: {
                 revalidate: 0
             }
@@ -310,30 +312,37 @@ async function createProduct(productData) {
     }
 }
 async function updateProduct(id, productData) {
-    try {
-        const res = await fetch(`${API_URL}/${id}`, {
-            method: 'PATCH',
-            body: productData,
-            // Không đặt Content-Type header khi sử dụng FormData
-            credentials: 'include',
-            next: {
-                revalidate: 0
-            }
-        });
-        if (!res.ok) {
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(productData)
+    });
+    if (!res.ok) {
+        let errorMessage = `Failed to update product with id ${id}`;
+        try {
             const errorData = await res.json();
-            if (errorData.errors) {
-                // Xử lý lỗi validation từ server
-                const errorMessages = errorData.errors.map((err)=>`${err.field}: ${err.message}`).join(', ');
-                throw new Error(errorMessages);
-            }
-            throw new Error(errorData.message || `Failed to update product with id ${id}`);
-        }
-        return res.json();
-    } catch (error) {
-        console.error(`Error updating product with id ${id}:`, error);
-        throw error;
+            errorMessage = errorData.message || errorMessage;
+        } catch (_) {}
+        throw new Error(errorMessage);
     }
+    return res.json();
+}
+async function updateProductWithImage(id, formData) {
+    const res = await fetch(`${API_URL}/${id}/upload`, {
+        method: 'POST',
+        body: formData
+    });
+    if (!res.ok) {
+        let errorMessage = `Failed to update product image with id ${id}`;
+        try {
+            const errorData = await res.json();
+            errorMessage = errorData.message || errorMessage;
+        } catch (_) {}
+        throw new Error(errorMessage);
+    }
+    return res.json();
 }
 async function deleteProduct(id) {
     try {
@@ -389,7 +398,7 @@ function ProductListPage() {
             setIsLoading(true);
             try {
                 const data = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$services$2f$productService$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAllProducts"])(currentPage, 10);
-                setProducts(data.products);
+                setProducts(data.content);
                 setTotalPages(data.totalPages);
             } catch (error) {
                 console.error('Lỗi khi lấy sản phẩm:', error);
@@ -409,7 +418,7 @@ function ProductListPage() {
         className: "container mx-auto p-6",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                className: "text-xl font-semibold mb-4",
+                className: "text-xl font-semibold mb-4 text-black",
                 children: "Danh sách sản phẩm"
             }, void 0, false, {
                 fileName: "[project]/app/admin/products/page.tsx",

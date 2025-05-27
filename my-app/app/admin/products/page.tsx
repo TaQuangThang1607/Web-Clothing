@@ -22,7 +22,7 @@ export default function ProductListPage() {
       setIsLoading(true);
       try {
         const data = await getAllProducts(currentPage, 10);
-        setProducts(data.products);
+        setProducts(data.content);
         setTotalPages(data.totalPages);
       } catch (error) {
         console.error('Lỗi khi lấy sản phẩm:', error);
@@ -40,7 +40,7 @@ export default function ProductListPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h2 className="text-xl font-semibold mb-4">Danh sách sản phẩm</h2>
+      <h2 className="text-xl font-semibold mb-4 text-black">Danh sách sản phẩm</h2>
       <Link href="/admin/products/create" className="inline-block mb-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
         Thêm sản phẩm mới
       </Link>

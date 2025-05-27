@@ -1,35 +1,23 @@
 package com.example.Shoes.Controller.Admin;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.Shoes.domain.Product;
 import com.example.Shoes.domain.dto.ProductDTO;
 import com.example.Shoes.service.ProductService;
+import com.example.Shoes.utils.ApiResponse;
+import com.example.Shoes.utils.PagedResponse;
 
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/admin/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -38,79 +26,72 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/products")
-    public ResponseEntity<Map<String, Object>> getAllProduct(
+    @GetMapping
+    public ResponseEntity<PagedResponse<ProductDTO>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Product> productPage = productService.getAllProduct(pageable);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("products", productPage.getContent());
-        response.put("currentPage", productPage.getNumber());
-        response.put("totalItems", productPage.getTotalElements());
-        response.put("totalPages", productPage.getTotalPages());
-
+        
+        Page<ProductDTO> productPage = productService.getAllProducts(PageRequest.of(page, size));
+        
         if (productPage.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(response);
+        
+        return ResponseEntity.ok(new PagedResponse<>(
+            productPage.getContent(),
+            productPage.getNumber(),
+            productPage.getTotalElements(),
+            productPage.getTotalPages()
+        ));
     }
 
-    @PostMapping(value = "/products", consumes = {"multipart/form-data"})
-    public ResponseEntity<Product> createProduct(
-        @RequestPart("product") ProductDTO dto,
-        @RequestPart("image") MultipartFile image
-    ) {
-        Product product = productService.handleCreateProduct(dto, image);
-        return ResponseEntity.status(201).body(product);
-    }
-
-    @GetMapping("/products/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        Product product = productService.getProductById(id);
-        if (product == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(product);
-    }
-
-    @PatchMapping(value = "/products/{id}", consumes = {"multipart/form-data"})
-    public ResponseEntity<Object> updateProduct(
-        @RequestPart("product") @Valid ProductDTO dto,
-        @RequestPart(value = "image", required = false) MultipartFile image,
-        @PathVariable Long id,
-        BindingResult bindingResult
-    ) {
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<ApiResponse<ProductDTO>> createProduct(
+            @RequestPart("product") @Valid ProductDTO dto,
+            @RequestPart("image") MultipartFile image,
+            BindingResult bindingResult) {
+        
         if (bindingResult.hasErrors()) {
-            List<Map<String, String>> errors = bindingResult.getFieldErrors().stream()
-                .map(error -> {
-                    Map<String, String> errorMap = new HashMap<>();
-                    errorMap.put("field", error.getField());
-                    errorMap.put("message", error.getDefaultMessage());
-                    return errorMap;
-                })
-                .collect(Collectors.toList());
-
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errors", errors);
-
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(getValidationErrors(bindingResult)));
         }
 
-        // Gọi service cập nhật
-        Product updatedProduct = productService.handleUpdateProduct(dto, image,id);
-
-        return ResponseEntity.ok(updatedProduct);
+        ProductDTO createdProduct = productService.createProduct(dto, image);
+        return ResponseEntity.status(201)
+                .body(ApiResponse.success(createdProduct, "Product created successfully"));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductDTO>> getProductById(@PathVariable Long id) {
+        ProductDTO product = productService.getProductById(id);
+        return ResponseEntity.ok(ApiResponse.success(product));
+    }
 
-    @DeleteMapping("/products/{id}")
-    public ResponseEntity<Object> deleteProduct(@PathVariable Long id) {
-        productService.handleRemoveProduct(id);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Đã xóa sản phẩm thành công");
+    @PatchMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    public ResponseEntity<ApiResponse<ProductDTO>> updateProduct(
+            @PathVariable Long id,
+            @RequestPart("product") @Valid ProductDTO dto,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            BindingResult bindingResult) {
+        
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(getValidationErrors(bindingResult)));
+        }
 
-        return ResponseEntity.ok(response);
+        ProductDTO updatedProduct = productService.updateProduct(id, dto, image);
+        return ResponseEntity.ok(ApiResponse.success(updatedProduct, "Product updated successfully"));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "Product deleted successfully"));
+    }
+
+    private List<String> getValidationErrors(BindingResult bindingResult) {
+        return bindingResult.getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.toList());
     }
 }

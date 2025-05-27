@@ -1,6 +1,7 @@
 // components/ProductTable.tsx
 import Link from "next/link";
 import { Product } from "../types/product";
+import { deleteProduct } from "../services/productService";
 
 interface Props {
   products: Product[];
@@ -9,10 +10,24 @@ interface Props {
   onPageChange: (page: number) => void;
 }
 
+
+
 export default function ProductTable({ products, currentPage, totalPages, onPageChange }: Props) {
+
+  const handleDelete = async (id: number) => {
+  if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+    try {
+      await deleteProduct(id);
+      onPageChange(currentPage); // Làm mới trang
+      alert('Xóa sản phẩm thành công!');
+    } catch (error) {
+      alert('Lỗi khi xóa sản phẩm');
+    }
+  }
+};
   return (
     <div>
-      <table className="w-full border-collapse border border-gray-300">
+      <table className="w-full border-collapse border border-gray-300 text-black">
         <thead>
           <tr className="bg-gray-100">
             <th className="border p-2">ID</th>
@@ -32,10 +47,18 @@ export default function ProductTable({ products, currentPage, totalPages, onPage
               <td className="border p-2">{p.size}</td>
               <td className="border p-2">{p.color}</td>
               <td className="border p-2">
-                    <Link href={`/admin/products/update/${p.id}`} className="text-blue-500 hover:underline">
-                        Chỉnh sửa
-                    </Link>
+                <Link href={`/admin/products/update/${p.id}`} className="text-blue-500 hover:underline mr-2">
+                  Chỉnh sửa
+                </Link>
+                <button
+                  onClick={() => handleDelete(p.id)}
+                  className="text-red-500 hover:underline"
+                >
+                  Xóa
+                </button>
               </td>
+
+              
             </tr>
           ))}
         </tbody>

@@ -4,7 +4,7 @@ import FooterPage from "../components/Footer"
 import Header from "../components/Header"
 import { getAllProducts } from "../services/productService"
 import { Product } from "../types/product"
-
+// app/products/page.tsx
 export default function ListProducts() {
     const [products, setProducts] = useState<Product[]>([])
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
@@ -27,15 +27,15 @@ export default function ListProducts() {
             try {
                 setLoading(true)
                 const data = await getAllProducts(currentPage)
-                setProducts(data.products)
+                setProducts(data.content)
                 
-                // Calculate product counts for each brand
-                const updatedBrands = brands.map(brand => ({
-                    ...brand,
-                    count: data.products.filter(p => p.category === brand.name).length
+               const updatedBrands = brands.map(brand => ({
+                ...brand,
+                count: data.content.filter(p => p.category === brand.name).length
                 }))
+
                 
-                setFilteredProducts(data.products)
+                setFilteredProducts(data.content)
                 setTotalPages(data.totalPages)
                 setLoading(false)
             } catch (err) {

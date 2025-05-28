@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Shoes.Model.dto.ProductDTO;
 import com.example.Shoes.Service.ProductService;
-import com.example.Shoes.utils.ApiResponse;
 
 @RestController
 @RequestMapping("/admin/custom-products")
@@ -23,12 +22,12 @@ public class HomeController {
     }
 
     @GetMapping("/by-ids")
-    public ResponseEntity<ApiResponse<List<ProductDTO>>> getProductsByIds(
+    public ResponseEntity<?> getProductsByIds(
             @RequestParam List<Long> ids) {
         
         if (ids.size() > 10) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(List.of("Maximum 10 product IDs allowed")));
+                    .body(List.of("Maximum 10 product IDs allowed"));
         }
         
         List<ProductDTO> products = productService.getProductsByIds(ids);
@@ -37,6 +36,6 @@ public class HomeController {
             return ResponseEntity.noContent().build();
         }
         
-        return ResponseEntity.ok(ApiResponse.success(products));
+        return ResponseEntity.ok(products);
     }
 }

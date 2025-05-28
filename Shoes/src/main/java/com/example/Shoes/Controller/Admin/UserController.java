@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.Shoes.Model.dto.UserDTO;
 import com.example.Shoes.Service.UserService;
-import com.example.Shoes.utils.ApiResponse;
 import com.example.Shoes.utils.PagedResponse;
+import com.example.Shoes.utils.error.IdInvalidException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,7 @@ public class UserController {
     public ResponseEntity<PagedResponse<UserDTO>> getAllUser(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
-    ){
+    ) {
         Page<UserDTO> userPage = userService.getAllUser(PageRequest.of(page, size));
         if (userPage.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -50,25 +50,31 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<UserDTO>> createUser(
-        @RequestBody UserDTO dto,
+    public ResponseEntity<?> createUser(
+        @RequestBody  UserDTO dto,
         BindingResult bindingResult
-    ){
-        if(bindingResult.hasErrors()){
+    ) throws IdInvalidException {
+        if(bindingResult.hasErrors()) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(getValidationErrors(bindingResult)));
+                    .body(getValidationErrors(bindingResult));
         }
+        boolean isEmailExist = this.userService.isEmailExist(dto.getEmail());
+        if(isEmailExist){
+            throw new IdInvalidException("Email: " + dto.getEmail() + "email đã tồn tại");
+        }
+
+
+
         String hashPassword = passwordEncoder.encode(dto.getPassword());
         dto.setPassword(hashPassword);
         UserDTO userDTO = userService.createUser(dto);
-        return ResponseEntity.status(201).body(ApiResponse.success(userDTO,"user created success"));
+        return ResponseEntity.status(201).body(userDTO);
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUserById(@PathVariable Long id){
+    public ResponseEntity<String> deleteUserById(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok(ApiResponse.success(null, "User deleted successfully "));
+        return ResponseEntity.ok("User deleted successfully");
     }
 
     private List<String> getValidationErrors(BindingResult bindingResult) {

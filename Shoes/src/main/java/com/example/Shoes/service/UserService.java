@@ -13,5 +13,6 @@ public interface UserService {
     void deleteUser (Long id);
     UserDTO createUser(UserDTO dto);
     User handleGetUserByEmail(String username);
+    boolean isEmailExist(String email);
 
 }

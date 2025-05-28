@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Shoes.Model.dto.ProductDTO;
-import com.example.Shoes.service.ProductService;
+import com.example.Shoes.Service.ProductService;
 import com.example.Shoes.utils.ApiResponse;
 
 @RestController

@@ -1,4 +1,4 @@
-package com.example.Shoes.service.impl;
+package com.example.Shoes.Service.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.Shoes.service.FileStorageService;
+import com.example.Shoes.Service.FileStorageService;
 
 @Service
 public class FileStorageServiceImpl implements FileStorageService {

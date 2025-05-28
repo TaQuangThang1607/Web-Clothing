@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.Shoes.Model.dto.ProductDTO;
-import com.example.Shoes.service.ProductService;
+import com.example.Shoes.Service.ProductService;
 import com.example.Shoes.utils.ApiResponse;
 import com.example.Shoes.utils.PagedResponse;
 

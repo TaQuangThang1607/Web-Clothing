@@ -1,9 +1,11 @@
-package com.example.Shoes.repository;
+package com.example.Shoes.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.Shoes.Model.User;
 
 public interface UserRepository extends JpaRepository<User,Long>{
+
+    User findByEmail(String username);
     
 }

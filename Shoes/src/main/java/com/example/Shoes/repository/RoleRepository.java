@@ -1,4 +1,4 @@
-package com.example.Shoes.repository;
+package com.example.Shoes.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

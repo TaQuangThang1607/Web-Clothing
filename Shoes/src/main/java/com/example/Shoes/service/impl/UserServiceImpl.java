@@ -1,15 +1,16 @@
-package com.example.Shoes.service.impl;
+package com.example.Shoes.Service.impl;
 
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.Shoes.Model.User;
 import com.example.Shoes.Model.dto.UserDTO;
 import com.example.Shoes.Model.mapper.UserMapper;
 import com.example.Shoes.exception.ResourceNotFoundException;
-import com.example.Shoes.repository.UserRepository;
-import com.example.Shoes.service.UserService;
+import com.example.Shoes.Repository.UserRepository;
+import com.example.Shoes.Service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,18 @@ public class UserServiceImpl implements UserService{
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
         
+    }
+
+    @Override
+    public UserDTO createUser(UserDTO dto) {
+        User user = userMapper.toEntity(dto);
+        User saveUser = userRepository.save(user);
+        return userMapper.toDto(saveUser);
+    }
+
+    @Override
+    public User handleGetUserByEmail(String username) {
+         return userRepository.findByEmail(username);
     }
 
     

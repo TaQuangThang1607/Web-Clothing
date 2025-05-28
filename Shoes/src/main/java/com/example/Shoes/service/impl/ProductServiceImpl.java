@@ -1,4 +1,4 @@
-package com.example.Shoes.service.impl;
+package com.example.Shoes.Service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,9 +12,9 @@ import com.example.Shoes.Model.Product;
 import com.example.Shoes.Model.dto.ProductDTO;
 import com.example.Shoes.Model.mapper.ProductMapper;
 import com.example.Shoes.exception.ResourceNotFoundException;
-import com.example.Shoes.repository.ProductRepository;
-import com.example.Shoes.service.FileStorageService;
-import com.example.Shoes.service.ProductService;
+import com.example.Shoes.Repository.ProductRepository;
+import com.example.Shoes.Service.FileStorageService;
+import com.example.Shoes.Service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 

@@ -1,5 +1,8 @@
 package com.example.Shoes.Service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -8,10 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.Shoes.Model.Product;
 import com.example.Shoes.Model.dto.ProductDTO;
 import com.example.Shoes.Model.mapper.ProductMapper;
+import com.example.Shoes.exception.ResourceNotFoundException;
 import com.example.Shoes.Repository.ProductRepository;
 import com.example.Shoes.Service.FileStorageService;
 import com.example.Shoes.Service.ProductService;
-import com.example.Shoes.exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -74,6 +77,13 @@ public class ProductServiceImpl implements ProductService {
         }
         
         productRepository.delete(product);
+    }
+    @Override
+    public List<ProductDTO> getProductsByIds(List<Long> ids) {
+       return productRepository.findAllById(ids)
+            .stream()
+            .map(productMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     

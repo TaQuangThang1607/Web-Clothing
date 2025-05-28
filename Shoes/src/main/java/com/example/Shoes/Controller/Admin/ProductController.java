@@ -1,10 +1,21 @@
 package com.example.Shoes.Controller.Admin;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.Shoes.Model.dto.ProductDTO;
@@ -13,8 +24,6 @@ import com.example.Shoes.utils.ApiResponse;
 import com.example.Shoes.utils.PagedResponse;
 
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/products")
@@ -94,4 +103,21 @@ public class ProductController {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.toList());
     }
+    @GetMapping("/by-ids")
+public ResponseEntity<ApiResponse<List<ProductDTO>>> getProductsByIds(
+        @RequestParam List<Long> ids) {
+    
+    if (ids.size() > 10) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(List.of("Maximum 10 product IDs allowed")));
+    }
+    
+    List<ProductDTO> products = productService.getProductsByIds(ids);
+    
+    if (products.isEmpty()) {
+        return ResponseEntity.noContent().build();
+    }
+    
+    return ResponseEntity.ok(ApiResponse.success(products));
+}
 }

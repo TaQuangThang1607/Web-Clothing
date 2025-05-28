@@ -1,9 +1,8 @@
-import Image from "next/image";
 import Carousel from "./components/Carousel";
 import Featurs from "./components/Featurs";
-import BestProduct from "./components/BestProduct";
-import Header from "./components/Header";
 import FooterPage from "./components/Footer";
+import Header from "./components/Header";
+import ProductsByIdsView from "./components/ProductsByIdsView";
 
 export default function Home() {
   return (
@@ -15,7 +14,7 @@ export default function Home() {
         </div>
 
         <div className="w-full">
-          <BestProduct />
+          <ProductsByIdsView />
         </div>
     <FooterPage />
     </>

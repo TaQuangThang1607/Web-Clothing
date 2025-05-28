@@ -1,6 +1,6 @@
 // services/productService.ts
-import { Product } from "../types/product";
 import { ProductDTO } from "../types/dto/ProductDTO";
+import { Product } from "../types/product";
 
 const API_URL = 'http://localhost:8080/admin/products'
 
@@ -145,4 +145,18 @@ export async function deleteProduct(id: number): Promise<void> {
         console.error(`Error deleting product with id ${id}:`, error);
         throw error;
     }
+}
+// Thêm vào productService.ts
+export async function getRandomProducts(count: number = 10): Promise<Product[]> {
+  try {
+    // Lấy tất cả sản phẩm (hoặc có thể tối ưu bằng cách lấy ngẫu nhiên từ backend)
+    const allProducts = await getAllProducts(0, 100); // Lấy nhiều sản phẩm
+    
+    // Lấy ngẫu nhiên
+    const shuffled = [...allProducts.content].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  } catch (error) {
+    console.error('Error fetching random products:', error);
+    throw error;
+  }
 }

@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import com.example.Shoes.Model.User;
 import com.example.Shoes.Model.dto.UserDTO;
 import com.example.Shoes.Model.mapper.UserMapper;
+import com.example.Shoes.exception.ResourceNotFoundException;
 import com.example.Shoes.Repository.UserRepository;
 import com.example.Shoes.Service.UserService;
-import com.example.Shoes.exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 

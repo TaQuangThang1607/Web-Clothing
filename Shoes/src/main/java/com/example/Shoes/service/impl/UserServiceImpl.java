@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.example.Shoes.Model.User;
 import com.example.Shoes.Model.dto.UserDTO;
 import com.example.Shoes.Model.mapper.UserMapper;
-import com.example.Shoes.exception.ResourceNotFoundException;
 import com.example.Shoes.Repository.UserRepository;
 import com.example.Shoes.Service.UserService;
 
@@ -28,7 +27,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserDTO getUserById(Long id) {
         return userRepository.findById(id).map(userMapper::toDto)
-            .orElseThrow(() -> new ResourceNotFoundException("user id not found"));
+            .orElseThrow(() -> new RuntimeException("user id not found"));
 
     }
 
@@ -41,13 +40,21 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserDTO createUser(UserDTO dto) {
         User user = userMapper.toEntity(dto);
+
         User saveUser = userRepository.save(user);
         return userMapper.toDto(saveUser);
     }
 
+    
+
     @Override
     public User handleGetUserByEmail(String username) {
          return userRepository.findByEmail(username);
+    }
+
+    @Override
+    public boolean isEmailExist(String email) {
+        return this.userRepository.existsByEmail(email);
     }
 
     

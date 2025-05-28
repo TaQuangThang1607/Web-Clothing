@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.Shoes.Model.Product;
 import com.example.Shoes.Model.dto.ProductDTO;
 import com.example.Shoes.Model.mapper.ProductMapper;
-import com.example.Shoes.exception.ResourceNotFoundException;
 import com.example.Shoes.Repository.ProductRepository;
 import com.example.Shoes.Service.FileStorageService;
 import com.example.Shoes.Service.ProductService;
@@ -34,7 +33,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO getProductById(Long id) {
         return productRepository.findById(id).map(productMapper::toDto)
-            .orElseThrow(() -> new ResourceNotFoundException("product id not found"));
+            .orElseThrow(() -> new RuntimeException("product id not found"));
     }
     @Override
     public ProductDTO createProduct(ProductDTO dto, MultipartFile image) {
@@ -50,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO updateProduct(Long id, ProductDTO dto, MultipartFile image) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
         productMapper.updateProductFromDto(dto, product);
         
@@ -70,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
         if (product.getImageUrl() != null) {
             fileStorageService.deleteFile(product.getImageUrl());

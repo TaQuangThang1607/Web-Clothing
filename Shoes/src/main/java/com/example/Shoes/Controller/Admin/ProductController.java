@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.Shoes.Model.dto.ProductDTO;
 import com.example.Shoes.Service.ProductService;
-import com.example.Shoes.utils.ApiResponse;
 import com.example.Shoes.utils.PagedResponse;
 
 import jakarta.validation.Valid;
@@ -55,29 +54,28 @@ public class ProductController {
     }
 
     @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<ApiResponse<ProductDTO>> createProduct(
+    public ResponseEntity<?> createProduct(
             @RequestPart("product") @Valid ProductDTO dto,
             @RequestPart("image") MultipartFile image,
             BindingResult bindingResult) {
         
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(getValidationErrors(bindingResult)));
+                    .body(getValidationErrors(bindingResult));
         }
 
         ProductDTO createdProduct = productService.createProduct(dto, image);
-        return ResponseEntity.status(201)
-                .body(ApiResponse.success(createdProduct, "Product created successfully"));
+        return ResponseEntity.status(201).body(createdProduct);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductDTO>> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         ProductDTO product = productService.getProductById(id);
-        return ResponseEntity.ok(ApiResponse.success(product));
+        return ResponseEntity.ok(product);
     }
 
     @PatchMapping(value = "/{id}", consumes = {"multipart/form-data"})
-    public ResponseEntity<ApiResponse<ProductDTO>> updateProduct(
+    public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
             @RequestPart("product") @Valid ProductDTO dto,
             @RequestPart(value = "image", required = false) MultipartFile image,
@@ -85,17 +83,17 @@ public class ProductController {
         
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(getValidationErrors(bindingResult)));
+                    .body(getValidationErrors(bindingResult));
         }
 
         ProductDTO updatedProduct = productService.updateProduct(id, dto, image);
-        return ResponseEntity.ok(ApiResponse.success(updatedProduct, "Product updated successfully"));
+        return ResponseEntity.ok(updatedProduct);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        return ResponseEntity.ok(ApiResponse.success(null, "Product deleted successfully"));
+        return ResponseEntity.ok("Product deleted successfully");
     }
 
     private List<String> getValidationErrors(BindingResult bindingResult) {
@@ -103,21 +101,20 @@ public class ProductController {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.toList());
     }
+
     @GetMapping("/by-ids")
-public ResponseEntity<ApiResponse<List<ProductDTO>>> getProductsByIds(
-        @RequestParam List<Long> ids) {
-    
-    if (ids.size() > 10) {
-        return ResponseEntity.badRequest()
-                .body(ApiResponse.error(List.of("Maximum 10 product IDs allowed")));
+    public ResponseEntity<?> getProductsByIds(@RequestParam List<Long> ids) {
+        if (ids.size() > 10) {
+            return ResponseEntity.badRequest()
+                    .body(List.of("Maximum 10 product IDs allowed"));
+        }
+        
+        List<ProductDTO> products = productService.getProductsByIds(ids);
+        
+        if (products.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        
+        return ResponseEntity.ok(products);
     }
-    
-    List<ProductDTO> products = productService.getProductsByIds(ids);
-    
-    if (products.isEmpty()) {
-        return ResponseEntity.noContent().build();
-    }
-    
-    return ResponseEntity.ok(ApiResponse.success(products));
-}
 }

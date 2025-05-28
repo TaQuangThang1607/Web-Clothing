@@ -1,10 +1,10 @@
 'use client'
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import FooterPage from "../components/Footer"
 import Header from "../components/Header"
 import { getAllProducts } from "../services/productService"
 import { Product } from "../types/product"
-// app/products/page.tsx
+
 export default function ListProducts() {
     const [products, setProducts] = useState<Product[]>([])
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
@@ -13,6 +13,8 @@ export default function ListProducts() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
+    const [searchTerm, setSearchTerm] = useState("")
+    const [searchQuery, setSearchQuery] = useState("")
 
     const brands = [
         { name: "Nike", count: 0 },
@@ -22,34 +24,48 @@ export default function ListProducts() {
         { name: "Vans", count: 0 }
     ]
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                setLoading(true)
-                const data = await getAllProducts(currentPage)
-                setProducts(data.content)
-                
-               const updatedBrands = brands.map(brand => ({
+    // Fetch products from API
+    const fetchProducts = useCallback(async (page: number, query: string = "") => {
+        try {
+            setLoading(true)
+            const data = await getAllProducts(page, 10)
+            
+            // Update brand counts
+            const updatedBrands = brands.map(brand => ({
                 ...brand,
                 count: data.content.filter(p => p.category === brand.name).length
-                }))
+            }))
 
-                
-                setFilteredProducts(data.content)
-                setTotalPages(data.totalPages)
-                setLoading(false)
-            } catch (err) {
-                let errorMessage = 'Failed to fetch products'
-                if (err instanceof Error) {
-                    errorMessage = err.message
-                }
-                setError(errorMessage)
-                setLoading(false)
+            setProducts(data.content)
+            
+            // Apply filters
+            let filtered = data.content
+            if (query) {
+                filtered = filtered.filter(product => 
+                    product.name.toLowerCase().includes(query.toLowerCase()) || 
+                    product.description.toLowerCase().includes(query.toLowerCase())
+                )
             }
+            if (selectedBrand) {
+                filtered = filtered.filter(product => product.category === selectedBrand)
+            }
+            
+            setFilteredProducts(filtered)
+            setTotalPages(data.totalPages)
+            setLoading(false)
+        } catch (err) {
+            let errorMessage = 'Failed to fetch products'
+            if (err instanceof Error) {
+                errorMessage = err.message
+            }
+            setError(errorMessage)
+            setLoading(false)
         }
+    }, [selectedBrand])
 
-        fetchProducts()
-    }, [currentPage])
+    useEffect(() => {
+        fetchProducts(currentPage, searchQuery)
+    }, [currentPage, fetchProducts, searchQuery])
 
     const handleBrandFilter = (brand: string) => {
         if (selectedBrand === brand) {
@@ -58,7 +74,30 @@ export default function ListProducts() {
         } else {
             setSelectedBrand(brand)
             const filtered = products.filter(product => product.category === brand)
-            setFilteredProducts(filtered)
+            if (searchQuery) {
+                const searchFiltered = filtered.filter(product => 
+                    product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                    product.description.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                setFilteredProducts(searchFiltered)
+            } else {
+                setFilteredProducts(filtered)
+            }
+        }
+    }
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value)
+    }
+
+    const handleSearchSubmit = () => {
+        setSearchQuery(searchTerm)
+        setCurrentPage(0)
+    }
+
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSearchSubmit()
         }
     }
 
@@ -104,13 +143,19 @@ export default function ListProducts() {
                                         <input 
                                             type="search" 
                                             className="flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                            placeholder=""
+                                            placeholder="Search products..."
+                                            value={searchTerm}
+                                            onChange={handleSearchChange}
+                                            onKeyPress={handleKeyPress}
                                         />
-                                        <span className="bg-gray-100 p-3 border border-l-0 border-gray-300 rounded-r-md">
+                                        <button 
+                                            className="bg-gray-100 p-3 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200"
+                                            onClick={handleSearchSubmit}
+                                        >
                                             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
-                                        </span>
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="lg:col-span-5"></div>
@@ -185,37 +230,44 @@ export default function ListProducts() {
                                 </div>
                                 <div className="lg:col-span-9">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {filteredProducts.map((product) => (
-                                            <div key={product.id} className="relative rounded-lg shadow-md overflow-hidden">
-                                                <div className="relative">
-                                                    <img 
-                                                        src={`http://localhost:8080${product.imageUrl}`} 
-                                                        alt={product.name} 
-                                                        className="w-full h-48 object-cover rounded-t-lg" 
+                                        {filteredProducts.length > 0 ? (
+                                            filteredProducts.map((product) => (
+                                                <div key={product.id} className="relative rounded-lg shadow-md overflow-hidden">
+                                                    <div className="relative">
+                                                        <img 
+                                                            src={`http://localhost:8080${product.imageUrl}`} 
+                                                            alt={product.name} 
+                                                            className="w-full h-48 object-cover rounded-t-lg" 
                                                         />
-
-                                                    <div className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded text-sm">
-                                                        {product.category || 'Fruits'}
+                                                        <div className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded text-sm">
+                                                            {product.category || 'Fruits'}
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-4 border border-t-0 border-gray-200 rounded-b-lg">
+                                                        <h4 className="text-lg font-semibold text-gray-900">{product.name}</h4>
+                                                        <p className="text-gray-600 text-sm">{product.description}</p>
+                                                        <div className="flex justify-between items-center mt-4 flex-wrap">
+                                                            <p className="text-gray-900 font-bold text-lg">
+                                                                {product.price != null && !isNaN(product.price) 
+                                                                    ? Number(product.price).toFixed(2) 
+                                                                    : 'N/A'} đ
+                                                                / {product.size}
+                                                            </p>
+                                                            <a href="#" className="bg-white border border-gray-300 text-blue-500 px-3 py-2 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center">
+                                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                                                </svg>
+                                                                Add to cart
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="p-4 border border-t-0 border-gray-200 rounded-b-lg">
-                                                    <h4 className="text-lg font-semibold text-gray-900">{product.name}</h4>
-                                                    <p className="text-gray-600 text-sm">{product.description}</p>
-                                                    <div className="flex justify-between items-center mt-4 flex-wrap">
-                                                        <p className="text-gray-900 font-bold text-lg">{product.price != null && !isNaN(product.price) 
-                                                                                                            ? Number(product.price).toFixed(2) 
-                                                                                                            : 'N/A'} đ
-                                                                                                        / {product.size}</p>
-                                                        <a href="#" className="bg-white border border-gray-300 text-blue-500 px-3 py-2 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center">
-                                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                                            </svg>
-                                                            Add to cart
-                                                        </a>
-                                                    </div>
-                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="col-span-3 text-center py-10">
+                                                <p className="text-gray-500">No products found matching your criteria</p>
                                             </div>
-                                        ))}
+                                        )}
                                         <div className="col-span-1 sm:col-span-2 lg:col-span-3">
                                             <div className="flex justify-center mt-8 space-x-2">
                                                 <button 

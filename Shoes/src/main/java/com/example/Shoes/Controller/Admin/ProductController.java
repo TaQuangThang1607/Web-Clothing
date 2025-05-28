@@ -53,7 +53,25 @@ public class ProductController {
             productPage.getTotalPages()
         ));
     }
-
+    @GetMapping("/search")
+public ResponseEntity<PagedResponse<ProductDTO>> searchProducts(
+        @RequestParam String query,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+    
+    Page<ProductDTO> productPage = productService.getAllProducts(PageRequest.of(page, size), query);
+    
+    if (productPage.isEmpty()) {
+        return ResponseEntity.noContent().build();
+    }
+    
+    return ResponseEntity.ok(new PagedResponse<>(
+        productPage.getContent(),
+        productPage.getNumber(),
+        productPage.getTotalElements(),
+        productPage.getTotalPages()
+    ));
+}
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<ApiResponse<ProductDTO>> createProduct(
             @RequestPart("product") @Valid ProductDTO dto,
@@ -103,21 +121,5 @@ public class ProductController {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.toList());
     }
-    @GetMapping("/by-ids")
-public ResponseEntity<ApiResponse<List<ProductDTO>>> getProductsByIds(
-        @RequestParam List<Long> ids) {
     
-    if (ids.size() > 10) {
-        return ResponseEntity.badRequest()
-                .body(ApiResponse.error(List.of("Maximum 10 product IDs allowed")));
-    }
-    
-    List<ProductDTO> products = productService.getProductsByIds(ids);
-    
-    if (products.isEmpty()) {
-        return ResponseEntity.noContent().build();
-    }
-    
-    return ResponseEntity.ok(ApiResponse.success(products));
-}
 }

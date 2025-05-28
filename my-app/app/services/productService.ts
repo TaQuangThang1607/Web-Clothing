@@ -159,4 +159,5 @@ export async function getRandomProducts(count: number = 10): Promise<Product[]> 
     console.error('Error fetching random products:', error);
     throw error;
   }
+
 }

@@ -85,6 +85,13 @@ public class ProductServiceImpl implements ProductService {
             .map(productMapper::toDto)
             .collect(Collectors.toList());
     }
-
+    @Override
+    public Page<ProductDTO> getAllProducts(Pageable pageable, String searchTerm) {
+        return productRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+        searchTerm, 
+        searchTerm, 
+        pageable
+    ).map(productMapper::toDto);
+    }
     
 }

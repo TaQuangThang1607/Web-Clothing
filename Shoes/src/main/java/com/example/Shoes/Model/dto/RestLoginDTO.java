@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class RestLoginDTO {
     private String accessToken;
     private UserLogin user;
+    
 
     @Data
     @NoArgsConstructor

@@ -14,5 +14,6 @@ public interface UserService {
     UserDTO createUser(UserDTO dto);
     User handleGetUserByEmail(String username);
     boolean isEmailExist(String email);
+    void updataUserToken(String token, String email);
 
 }

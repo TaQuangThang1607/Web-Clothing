@@ -2,15 +2,25 @@ package com.example.Shoes.utils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+
+import com.example.Shoes.Model.dto.RestLoginDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,19 +36,21 @@ public class SecurityUtil {
     private String jwtKey;
 
 
-    @Value("${thangjwt.jwt.token-validity-in-seconds}")
-    private long jwtKeyExpiration;
+    @Value("${thangjwt.jwt.access-token-validity-in-seconds}")
+    private long accessTokenExpiration;
     
+    @Value("${thangjwt.jwt.refresh.token-validity-in-seconds}")
+    private long refreshTokenExpiration;
     
-    public String createToken(Authentication authentication){
+    public String createAccessToken(Authentication authentication, RestLoginDTO.UserLogin dto){
         Instant now = Instant.now();
-        Instant validity = now.plus(this.jwtKeyExpiration, ChronoUnit.SECONDS);
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
         .issuedAt(now)
         .expiresAt(validity)
         .subject(authentication.getName())
-        .claim("thangjwt", authentication)
+        .claim("user", dto)
         .build();
 
 
@@ -46,4 +58,87 @@ public class SecurityUtil {
         return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claimsSet)).getTokenValue();
     }
 
+
+    public String createRefreshToken(String email,RestLoginDTO dto){
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+
+        JwtClaimsSet claimsSet = JwtClaimsSet.builder()
+        .issuedAt(now)
+        .expiresAt(validity)
+        .subject(email)
+        .claim("user", dto.getUser())
+        .build();
+
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claimsSet)).getTokenValue();
+    }
+
+
+    private static String extractPrincipal(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        } else if (authentication.getPrincipal() instanceof UserDetails springSecurityUser) {
+            return springSecurityUser.getUsername();
+        } else if (authentication.getPrincipal() instanceof Jwt jwt) {
+            return jwt.getSubject();
+        } else if (authentication.getPrincipal() instanceof String s) {
+            return s;
+        }
+        return null;
+    }
+
+    /**
+     * Get the JWT of the current user.
+     *
+     * @return the JWT of the current user.
+     */
+    public static Optional<String> getCurrentUserJWT() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return Optional.ofNullable(securityContext.getAuthentication())
+            .filter(authentication -> authentication.getCredentials() instanceof String)
+            .map(authentication -> (String) authentication.getCredentials());
+    }
+    public static Optional<String> getCurrentUserLogin() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
+    }
+
+    /**
+     * Checks if the current user has any of the authorities.
+     *
+     * @param authorities the authorities to check.
+     * @return true if the current user has any of the authorities, false otherwise.
+     */
+    public static boolean hasCurrentUserAnyOfAuthorities(String... authorities) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (
+            authentication != null && getAuthorities(authentication).anyMatch(authority -> Arrays.asList(authorities).contains(authority))
+        );
+    }
+
+    /**
+     * Checks if the current user has none of the authorities.
+     *
+     * @param authorities the authorities to check.
+     * @return true if the current user has none of the authorities, false otherwise.
+     */
+    public static boolean hasCurrentUserNoneOfAuthorities(String... authorities) {
+        return !hasCurrentUserAnyOfAuthorities(authorities);
+    }
+
+    /**
+     * Checks if the current user has a specific authority.
+     *
+     * @param authority the authority to check.
+     * @return true if the current user has the authority, false otherwise.
+     */
+    public static boolean hasCurrentUserThisAuthority(String authority) {
+        return hasCurrentUserAnyOfAuthorities(authority);
+    }
+
+    private static Stream<String> getAuthorities(Authentication authentication) {
+        return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
+    }
 }

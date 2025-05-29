@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,9 +21,11 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
 
 import com.example.Shoes.Model.dto.RestLoginDTO;
+import com.nimbusds.jose.util.Base64;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,14 +47,14 @@ public class SecurityUtil {
     @Value("${thangjwt.jwt.refresh.token-validity-in-seconds}")
     private long refreshTokenExpiration;
     
-    public String createAccessToken(Authentication authentication, RestLoginDTO.UserLogin dto){
+    public String createAccessToken(String email, RestLoginDTO.UserLogin dto){
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
         .issuedAt(now)
         .expiresAt(validity)
-        .subject(authentication.getName())
+        .subject(email)
         .claim("user", dto)
         .build();
 
@@ -58,6 +63,18 @@ public class SecurityUtil {
         return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claimsSet)).getTokenValue();
     }
 
+
+    public Jwt checkValidRefreshToken(String token){
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
+                getSecretKey()).macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
+            try {
+                return jwtDecoder.decode(token);
+
+            } catch (Exception e) {
+                System.out.println(">>> Refreesh Token error: " + e.getMessage());
+                throw e;
+            }
+    }
 
     public String createRefreshToken(String email,RestLoginDTO dto){
         Instant now = Instant.now();
@@ -103,6 +120,12 @@ public class SecurityUtil {
     public static Optional<String> getCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
+    }
+
+    private SecretKey getSecretKey(){
+        byte[] keyBytes = Base64.encode(jwtKey).decode();
+        return new SecretKeySpec(keyBytes, 0,keyBytes.length, 
+           JWT_ALGORITHM.getName());
     }
 
     /**

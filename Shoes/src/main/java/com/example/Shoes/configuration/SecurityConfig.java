@@ -101,6 +101,7 @@ public class SecurityConfig {
 
     private SecretKey getSecretKey(){
         byte[] keyBytes = Base64.encode(jwtKey).decode();
-        return new SecretKeySpec(keyBytes, 0,keyBytes.length, SecurityUtil.JWT_ALGORITHM.getName());
+        return new SecretKeySpec(keyBytes, 0,keyBytes.length, 
+            SecurityUtil.JWT_ALGORITHM.getName());
     }
 }

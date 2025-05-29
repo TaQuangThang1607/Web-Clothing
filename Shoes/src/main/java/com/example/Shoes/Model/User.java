@@ -2,6 +2,7 @@ package com.example.Shoes.Model;
 
 import java.io.Serializable;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,4 +32,7 @@ public class User implements Serializable{
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String refreshToken;
 }

@@ -384,6 +384,10 @@
     grid-column: span 1 / span 1;
   }
 
+  .col-span-3 {
+    grid-column: span 3 / span 3;
+  }
+
   .container {
     width: 100%;
   }
@@ -1530,6 +1534,12 @@
   @media (hover: hover) {
     .hover\:bg-gray-100:hover {
       background-color: var(--color-gray-100);
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:bg-gray-200:hover {
+      background-color: var(--color-gray-200);
     }
   }
 

@@ -1,9 +1,8 @@
-// components/RandomProductsView.tsx
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getRandomProducts } from '../services/productService';
 import { Product } from '../types/product';
+import { getAllProductsInClient } from '../services/client/clientService';
 
 export default function RandomProductsView() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -14,10 +13,20 @@ export default function RandomProductsView() {
     const fetchRandomProducts = async () => {
       try {
         setLoading(true);
-        const data = await getRandomProducts(10);
-        setProducts(data);
+        const allProducts = await getAllProductsInClient();
+        
+        const validatedProducts = allProducts.map(product => ({
+          ...product,
+          price: product.price || 0,
+          imageUrl: product.imageUrl || '/placeholder-product.png'
+        }));
+        
+        // Shuffle logic
+        const shuffled = [...validatedProducts].sort(() => 0.5 - Math.random());
+        setProducts(shuffled.slice(0, 10));
+        
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch random products');
+        setError(err instanceof Error ? err.message : 'Failed to fetch products');
       } finally {
         setLoading(false);
       }
@@ -44,16 +53,23 @@ export default function RandomProductsView() {
         {products.map((product) => (
           <div key={product.id} className="border rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
             <div className="p-4">
-              {product.imageUrl && (
-                <img 
-                  src={`http://localhost:8080${product.imageUrl}`} 
+              <img 
+                  src={product.imageUrl.startsWith('http') 
+                       ? product.imageUrl 
+                       : `http://localhost:8080${product.imageUrl}`}
                   alt={product.name}
                   className="w-full h-48 object-cover mb-3"
+                  onError={(e) => {
+                    // Simply hide the image if it fails to load
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                
                 />
-              )}
               <h2 className="font-semibold text-lg">{product.name}</h2>
               <p className="text-gray-600 text-sm line-clamp-2">{product.description}</p>
-              <p className="text-green-600 font-bold mt-2">${product.price.toFixed(2)}</p>
+              <p className="text-green-600 font-bold mt-2">
+                ${typeof product.price === 'number' ? product.price.toFixed(2) : '0.00'}
+              </p>
             </div>
           </div>
         ))}

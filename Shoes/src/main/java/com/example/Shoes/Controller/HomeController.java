@@ -12,7 +12,7 @@ import com.example.Shoes.Model.dto.ProductDTO;
 import com.example.Shoes.Service.ProductService;
 
 @RestController
-@RequestMapping("/admin/custom-products")
+@RequestMapping("/api")
 public class HomeController {
 
     private final ProductService productService;
@@ -21,21 +21,11 @@ public class HomeController {
         this.productService = productService;
     }
 
-    @GetMapping("/by-ids")
-    public ResponseEntity<?> getProductsByIds(
-            @RequestParam List<Long> ids) {
+
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductDTO>> getallProduct(){
         
-        if (ids.size() > 10) {
-            return ResponseEntity.badRequest()
-                    .body(List.of("Maximum 10 product IDs allowed"));
-        }
-        
-        List<ProductDTO> products = productService.getProductsByIds(ids);
-        
-        if (products.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        
-        return ResponseEntity.ok(products);
+        List<ProductDTO> list = this.productService.fetchAllProduct();
+        return ResponseEntity.ok().body(list);
     }
 }

@@ -84,6 +84,13 @@ public class ProductServiceImpl implements ProductService {
             .map(productMapper::toDto)
             .collect(Collectors.toList());
     }
+    @Override
+    public List<ProductDTO> fetchAllProduct() {
+        return productRepository.findAll()
+                .stream()
+                .map(productMapper::toDto) 
+                .collect(Collectors.toList());
+    }
 
     
 }

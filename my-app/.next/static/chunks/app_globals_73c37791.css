@@ -1677,10 +1677,6 @@
     outline-style: none;
   }
 
-  .disabled\:bg-gray-400:disabled {
-    background-color: var(--color-gray-400);
-  }
-
   .disabled\:opacity-50:disabled {
     opacity: .5;
   }

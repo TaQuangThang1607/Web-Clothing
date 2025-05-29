@@ -16,4 +16,5 @@ public interface UserService {
     boolean isEmailExist(String email);
     void updataUserToken(String token, String email);
 
+    User getUserByRefreshTokenAndEmail(String token, String email);
 }

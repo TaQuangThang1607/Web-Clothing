@@ -10,14 +10,21 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    // Nếu user chưa load, thử lấy từ localStorage
     if (!user) {
       const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+      if (storedUser && storedUser !== 'undefined' && storedUser !== 'null') {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error('Error parsing user from localStorage:', error);
+          setUser(null);
+        }
+      } else {
+        setUser(null);
       }
     }
   }, [user, setUser]);
+
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');

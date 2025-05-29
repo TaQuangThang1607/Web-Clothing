@@ -31,7 +31,13 @@ export async function getAllProducts(page: number = 0, size: number = 10): Promi
                 totalPages: 0
             };
         }
-        return res.json();
+        if (!res.ok) {
+            throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+        // return res.json();
+        const text = await res.text();
+        const data = text ? JSON.parse(text) : { content: [], page: 0, totalElements: 0, totalPages: 0 };
+        return data
     } catch (error) {
         console.error('Error fetching products:', error);
         throw error;
@@ -146,17 +152,14 @@ export async function deleteProduct(id: number): Promise<void> {
         throw error;
     }
 }
-// Thêm vào productService.ts
-export async function getRandomProducts(count: number = 10): Promise<Product[]> {
-  try {
-    // Lấy tất cả sản phẩm (hoặc có thể tối ưu bằng cách lấy ngẫu nhiên từ backend)
-    const allProducts = await getAllProducts(0, 100); // Lấy nhiều sản phẩm
+// export async function getRandomProducts(count: number = 10): Promise<Product[]> {
+//   try {
+//     const allProducts = await getAllProducts(0, 100);
     
-    // Lấy ngẫu nhiên
-    const shuffled = [...allProducts.content].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-  } catch (error) {
-    console.error('Error fetching random products:', error);
-    throw error;
-  }
-}
+//     const shuffled = [...allProducts.content].sort(() => 0.5 - Math.random());
+//     return shuffled.slice(0, count);
+//   } catch (error) {
+//     console.error('Error fetching random products:', error);
+//     throw error;
+//   }
+// }

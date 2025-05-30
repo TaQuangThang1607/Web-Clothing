@@ -43,47 +43,51 @@ public class AuthControlleer {
 
 
     
-    @PostMapping("/auth/login")
-    public ResponseEntity<Object> login(@RequestBody UserDTO dto) {
-        UsernamePasswordAuthenticationToken authenticationToken = 
-            new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
+   @PostMapping("/auth/login")
+public ResponseEntity<RestLoginDTO> login(@RequestBody UserDTO dto) {
+    UsernamePasswordAuthenticationToken authenticationToken = 
+        new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        
-        
-        RestLoginDTO restLoginDTO = new RestLoginDTO();
+    Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+    
+    RestLoginDTO restLoginDTO = new RestLoginDTO();
+    User currentUserDB = userService.handleGetUserByEmail(dto.getEmail());
 
-        User currentUserDB = userService.handleGetUserByEmail(dto.getEmail());
+    if (currentUserDB != null) {
+        RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(
+            currentUserDB.getId(), 
+            currentUserDB.getEmail(), 
+            currentUserDB.getFullName(),
+            currentUserDB.getRole().getName()
+        );
+        restLoginDTO.setUser(userLogin);
+    }
 
-        if(currentUserDB != null){
-            RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin
-            (currentUserDB.getId(), currentUserDB.getEmail(), currentUserDB.getFullName());
-            restLoginDTO.setUser(userLogin);
-        }
+    String accessToken = securityUtil.createAccessToken(authentication.getName(), restLoginDTO.getUser());
+    String refreshToken = securityUtil.createRefreshToken(dto.getEmail(), restLoginDTO);
 
-        String accessToken = securityUtil.createAccessToken(authentication.getName(), restLoginDTO.getUser());
+    restLoginDTO.setAccessToken(accessToken);
+    userService.updataUserToken(refreshToken, dto.getEmail());
 
-        restLoginDTO.setAccessToken(accessToken);
+    ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
+        .httpOnly(true)
+        .secure(true)
+        .path("/")
+        .maxAge(3600) // 1 giờ
+        .build();
 
-        //create refresh token
-        String refreshToken = this.securityUtil.createRefreshToken(dto.getEmail(), restLoginDTO);
-        
-        this.userService.updataUserToken(refreshToken, dto.getEmail());
-
-        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", refreshToken)
+    ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
         .httpOnly(true)
         .secure(true)
         .path("/")
         .maxAge(refreshTokenExpiration)
         .build();
-        
-        
-        return ResponseEntity.ok()
-        .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-        .body(restLoginDTO);
-    }
 
+    return ResponseEntity.ok()
+        .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+        .body(restLoginDTO);
+}
     
    @GetMapping("/auth/account")
     public ResponseEntity<RestLoginDTO.UserGetAccount> getAccount() {
@@ -102,7 +106,8 @@ public class AuthControlleer {
         RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(
             currentUserDB.getId(),
             currentUserDB.getEmail(),
-            currentUserDB.getFullName()
+            currentUserDB.getFullName(),
+            currentUserDB.getRole().getName()
         );
         
         RestLoginDTO.UserGetAccount userGetAccount = new RestLoginDTO.UserGetAccount();
@@ -134,7 +139,12 @@ public class AuthControlleer {
 
         if(currentUserDB != null){
             RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin
-            (currentUserDB.getId(), currentUserDB.getEmail(), currentUserDB.getFullName());
+            (currentUserDB.getId(), 
+            currentUserDB.getEmail(), 
+            currentUserDB.getFullName(),
+            currentUserDB.getRole().getName()
+
+            );
             restLoginDTO.setUser(userLogin);
         }
 
@@ -185,4 +195,6 @@ public class AuthControlleer {
     .body(null);
         
     }
+
+    
 }

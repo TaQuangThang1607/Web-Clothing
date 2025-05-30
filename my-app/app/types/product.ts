@@ -7,6 +7,5 @@ export interface Product {
   size: string
   color: string
   imageUrl: string
-  category: string
   brand: string
 }

@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
+import Link from 'next/link';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,19 +13,23 @@ export default function Header() {
   useEffect(() => {
     if (!user) {
       const storedUser = localStorage.getItem('user');
-      if (storedUser && storedUser !== 'undefined' && storedUser !== 'null') {
+      if (storedUser) {
         try {
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser && typeof parsedUser === 'object') {
+            setUser(parsedUser);
+          } else {
+            setUser(null);
+            localStorage.removeItem('user');
+          }
         } catch (error) {
-          console.error('Error parsing user from localStorage:', error);
+          console.error('Lỗi khi parse user từ localStorage:', error);
           setUser(null);
+          localStorage.removeItem('user');
         }
-      } else {
-        setUser(null);
       }
     }
   }, [user, setUser]);
-
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -78,6 +83,11 @@ export default function Header() {
               <button onClick={handleLogout} className="text-red-500 hover:underline">
                 Logout
               </button>
+              <Link href="/admin/products"
+              className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+              >
+                Page Admin
+              </Link>
             </>
           ) : (
             <a href="/login" className="text-gray-700">Login</a>

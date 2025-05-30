@@ -1,6 +1,8 @@
 package com.example.Shoes.Controller.Admin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -33,7 +35,6 @@ public class ProductController {
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
-
     @GetMapping
     public ResponseEntity<PagedResponse<ProductDTO>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
@@ -52,7 +53,6 @@ public class ProductController {
             productPage.getTotalPages()
         ));
     }
-
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createProduct(
             @RequestPart("product") @Valid ProductDTO dto,
@@ -67,13 +67,11 @@ public class ProductController {
         ProductDTO createdProduct = productService.createProduct(dto, image);
         return ResponseEntity.status(201).body(createdProduct);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         ProductDTO product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
-
     @PatchMapping(value = "/{id}", consumes = {"multipart/form-data"})
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
@@ -89,19 +87,20 @@ public class ProductController {
         ProductDTO updatedProduct = productService.updateProduct(id, dto, image);
         return ResponseEntity.ok(updatedProduct);
     }
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        return ResponseEntity.ok("Product deleted successfully");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Product deleted successfully");
+        return ResponseEntity.ok(response);
     }
+
 
     private List<String> getValidationErrors(BindingResult bindingResult) {
         return bindingResult.getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.toList());
     }
-
     @GetMapping("/by-ids")
     public ResponseEntity<?> getProductsByIds(@RequestParam List<Long> ids) {
         if (ids.size() > 10) {

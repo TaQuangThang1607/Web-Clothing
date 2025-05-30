@@ -1,10 +1,11 @@
 'use client';
 
-import { getProductById } from '@/app/services/productService';
+import { getProductById, updateProduct } from '@/app/services/productService';
 import { ProductDTO } from '@/app/types/dto/ProductDTO';
 import { useRouter, useParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
-// app/admin/products/update/[id]/page.tsx
+import { fetchWithTokenRefresh } from '@/app/services/apiService';
+
 export default function UpdateProduct() {
   const router = useRouter();
   const { id } = useParams();
@@ -31,14 +32,12 @@ export default function UpdateProduct() {
       setIsFetching(true);
       setError(null);
 
-      const productId = Array.isArray(id) ? id[0] : id;
-      if (!productId || isNaN(parseInt(productId))) {
-        setError('ID sản phẩm không hợp lệ');
-        setIsFetching(false);
-        return;
-      }
-
       try {
+        const productId = Array.isArray(id) ? id[0] : id;
+        if (!productId || isNaN(parseInt(productId))) {
+          throw new Error('ID sản phẩm không hợp lệ');
+        }
+
         const product = await getProductById(parseInt(productId));
         setFormData({
           id: product.id || 0,
@@ -48,9 +47,9 @@ export default function UpdateProduct() {
           color: product.color || '',
           price: product.price ?? 0,
           brand: product.brand || '',
-          imageUrl: product.imageUrl || '', // Xử lý trường hợp imageUrl không có
+          imageUrl: product.imageUrl || '',
         });
-        setImagePreview(product.imageUrl || null);
+        setImagePreview(product.imageUrl ? `http://localhost:8080${product.imageUrl}` : null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Lỗi khi lấy thông tin sản phẩm');
       } finally {
@@ -83,69 +82,52 @@ export default function UpdateProduct() {
       setError(null);
     } else {
       setImageFile(null);
-      setImagePreview(formData.imageUrl);
+      setImagePreview(formData.imageUrl ? `http://localhost:8080${formData.imageUrl}` : null);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!confirm('Bạn có chắc muốn cập nhật sản phẩm này?')) return;
-    setIsLoading(true);
-    setError(null);
-    setSuccess(null);
+  e.preventDefault();
+  if (!confirm('Bạn có chắc muốn cập nhật sản phẩm này?')) return;
+  setIsLoading(true);
+  setError(null);
+  setSuccess(null);
 
-    try {
-      const productId = Array.isArray(id) ? id[0] : id;
-      if (!productId || isNaN(parseInt(productId))) {
-        throw new Error('ID sản phẩm không hợp lệ');
-      }
-
-      // Validate form data
-      if (!formData.name || !formData.size || !formData.color || !formData.brand) {
-        throw new Error('Vui lòng điền đầy đủ các trường bắt buộc');
-      }
-
-      if (formData.price === 0 || isNaN(formData.price)) {
-        throw new Error('Vui lòng nhập giá sản phẩm hợp lệ');
-      }
-
-      const formDataUpload = new FormData();
-
-      const productBlob = new Blob([JSON.stringify({
-        id: formData.id,
-        name: formData.name,
-        description: formData.description,
-        size: formData.size,
-        color: formData.color,
-        price: Number(formData.price),
-        brand: formData.brand,
-        imageUrl: formData.imageUrl,
-      })], { type: 'application/json' });
-
-      formDataUpload.append('product', productBlob);
-
-      if (imageFile) {
-        formDataUpload.append('image', imageFile);
-      }
-
-      const res = await fetch(`http://localhost:8080/admin/products/${productId}`, {
-        method: 'PATCH',
-        body: formDataUpload,
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || errorData.errors?.join(', ') || 'Lỗi khi cập nhật sản phẩm');
-      }
-
-      setSuccess('Cập nhật sản phẩm thành công!');
-      setTimeout(() => router.push('/admin/products'), 2000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Lỗi khi cập nhật sản phẩm');
-    } finally {
-      setIsLoading(false);
+  try {
+    const productId = Array.isArray(id) ? id[0] : id;
+    if (!productId || isNaN(parseInt(productId))) {
+      throw new Error('ID sản phẩm không hợp lệ');
     }
-  };
+
+    // Validate form data
+    if (!formData.name || !formData.size || !formData.color || !formData.brand) {
+      throw new Error('Vui lòng điền đầy đủ các trường bắt buộc');
+    }
+
+    if (formData.price <= 0 || isNaN(formData.price)) {
+      throw new Error('Vui lòng nhập giá sản phẩm hợp lệ');
+    }
+
+    // Gọi service updateProduct
+    const updated = await updateProduct(parseInt(productId), {
+      id: formData.id,
+      name: formData.name,
+      description: formData.description,
+      size: formData.size,
+      color: formData.color,
+      price: formData.price,
+      brand: formData.brand,
+      imageUrl: formData.imageUrl,
+    }, imageFile || undefined);
+
+    setSuccess('Cập nhật sản phẩm thành công!');
+    setTimeout(() => router.push('/admin/products'), 2000);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Lỗi khi cập nhật sản phẩm');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="container mx-auto p-6 max-w-2xl text-black">

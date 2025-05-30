@@ -5,29 +5,38 @@ import { useRouter } from "next/navigation";
 import { useUser } from "../context/UserContext";
 import { loginApi } from "../services/apiService";
 
-export default function Login() {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { setUser } = useUser();
   const router = useRouter();
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');  // clear error
+    setError('');
 
     try {
-      const { access_token, user } = await loginApi(email, password);
+      const { user, access_token } = await loginApi(email, password);
 
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
-
       setUser(user);
-      router.push('/');
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || 'Login failed');
-    }
+
+      // Chuyển hướng dựa trên role
+      if (user.role === 'ADMIN') {
+        router.push('/');
+      } else {
+        router.push('/');
+      }
+    } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+      }
+
   };
 
   return (

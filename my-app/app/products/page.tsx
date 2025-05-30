@@ -2,17 +2,18 @@
 import { useEffect, useState } from "react"
 import FooterPage from "../components/Footer"
 import Header from "../components/Header"
-import { getAllProducts } from "../services/productService"
-import { Product } from "../types/product"
-// app/products/page.tsx
+import { getAllPageProducts } from "../services/client/viewpageProduct"
+import { ProductDTO } from "../types/dto/ProductDTO"
+
 export default function ListProducts() {
-    const [products, setProducts] = useState<Product[]>([])
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+    const [products, setProducts] = useState<ProductDTO[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<ProductDTO[]>([])
     const [currentPage, setCurrentPage] = useState(0)
     const [totalPages, setTotalPages] = useState(1)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
+    const [searchTerm, setSearchTerm] = useState("") // Thêm state cho từ khóa tìm kiếm
 
     const brands = [
         { name: "Nike", count: 0 },
@@ -25,42 +26,55 @@ export default function ListProducts() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                setLoading(true)
-                const data = await getAllProducts(currentPage)
-                setProducts(data.content)
+                setLoading(true);
+                const data = await getAllPageProducts();
+                console.log('Fetched products:', data);
                 
-               const updatedBrands = brands.map(brand => ({
-                ...brand,
-                count: data.content.filter(p => p.category === brand.name).length
-                }))
+                setProducts(data);
+                setFilteredProducts(data);
 
-                
-                setFilteredProducts(data.content)
-                setTotalPages(data.totalPages)
-                setLoading(false)
+                const updatedBrands = brands.map(brand => ({
+                    ...brand,
+                    count: data.filter(p => p.brand === brand.name).length
+                }));
             } catch (err) {
-                let errorMessage = 'Failed to fetch products'
-                if (err instanceof Error) {
-                    errorMessage = err.message
-                }
-                setError(errorMessage)
-                setLoading(false)
+                console.error('Fetch error:', err);
+                setError(err instanceof Error ? err.message : 'Failed to fetch');
+            } finally {
+                setLoading(false);
             }
-        }
+        };
 
-        fetchProducts()
-    }, [currentPage])
+        fetchProducts();
+    }, []);
 
-    const handleBrandFilter = (brand: string) => {
-        if (selectedBrand === brand) {
-            setSelectedBrand(null)
-            setFilteredProducts(products)
+    // Hàm xử lý tìm kiếm
+    const handleSearch = () => {
+        if (searchTerm.trim() === "") {
+            setFilteredProducts(products);
         } else {
-            setSelectedBrand(brand)
-            const filtered = products.filter(product => product.category === brand)
-            setFilteredProducts(filtered)
-        }
+            const searchTermLower = searchTerm.toLowerCase();
+            const filtered = products.filter(product => {
+            const name = product.name ? product.name.toLowerCase() : '';
+            const description = product.description ? product.description.toLowerCase() : '';
+            const brand = product.brand ? product.brand.toLowerCase() : '';
+            
+            return (
+                name.includes(searchTermLower) ||
+                description.includes(searchTermLower) ||
+                brand.includes(searchTermLower)
+            );
+        });
+        setFilteredProducts(filtered);
     }
+};
+
+    // Xử lý khi nhấn phím Enter
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page)
@@ -104,9 +118,15 @@ export default function ListProducts() {
                                         <input 
                                             type="search" 
                                             className="flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                            placeholder=""
+                                            placeholder="Search products..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            onKeyDown={handleKeyDown}
                                         />
-                                        <span className="bg-gray-100 p-3 border border-l-0 border-gray-300 rounded-r-md">
+                                        <span 
+                                            className="bg-gray-100 p-3 border border-l-0 border-gray-300 rounded-r-md cursor-pointer hover:bg-gray-200"
+                                            onClick={handleSearch}
+                                        >
                                             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
@@ -140,7 +160,6 @@ export default function ListProducts() {
                                                     <li 
                                                         key={index} 
                                                         className="flex justify-between items-center cursor-pointer"
-                                                        onClick={() => handleBrandFilter(brand.name)}
                                                     >
                                                         <span className={`flex items-center ${selectedBrand === brand.name ? 'text-blue-500 font-medium' : 'text-gray-700 hover:text-blue-500'}`}>
                                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,20 +211,21 @@ export default function ListProducts() {
                                                         src={`http://localhost:8080${product.imageUrl}`} 
                                                         alt={product.name} 
                                                         className="w-full h-48 object-cover rounded-t-lg" 
-                                                        />
+                                                    />
 
                                                     <div className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded text-sm">
-                                                        {product.category || 'Fruits'}
+                                                        {/* {product.category || 'Fruits'} */}
                                                     </div>
                                                 </div>
                                                 <div className="p-4 border border-t-0 border-gray-200 rounded-b-lg">
                                                     <h4 className="text-lg font-semibold text-gray-900">{product.name}</h4>
                                                     <p className="text-gray-600 text-sm">{product.description}</p>
                                                     <div className="flex justify-between items-center mt-4 flex-wrap">
-                                                        <p className="text-gray-900 font-bold text-lg">{product.price != null && !isNaN(product.price) 
-                                                                                                            ? Number(product.price).toFixed(2) 
-                                                                                                            : 'N/A'} đ
-                                                                                                        / {product.size}</p>
+                                                        <p className="text-gray-900 font-bold text-lg">
+                                                            {product.price != null && !isNaN(product.price) 
+                                                                ? Number(product.price).toFixed(2) 
+                                                                : 'N/A'} đ / {product.size}
+                                                        </p>
                                                         <a href="#" className="bg-white border border-gray-300 text-blue-500 px-3 py-2 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center">
                                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -216,6 +236,11 @@ export default function ListProducts() {
                                                 </div>
                                             </div>
                                         ))}
+                                        {filteredProducts.length === 0 && (
+                                            <div className="col-span-3 text-center py-10">
+                                                <p className="text-gray-500 text-lg">No products found matching your search criteria.</p>
+                                            </div>
+                                        )}
                                         <div className="col-span-1 sm:col-span-2 lg:col-span-3">
                                             <div className="flex justify-center mt-8 space-x-2">
                                                 <button 

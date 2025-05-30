@@ -60,7 +60,6 @@ export default function RandomProductsView() {
                   alt={product.name}
                   className="w-full h-48 object-cover mb-3"
                   onError={(e) => {
-                    // Simply hide the image if it fails to load
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 

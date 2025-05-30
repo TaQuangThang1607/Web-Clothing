@@ -22,6 +22,7 @@ public class RestLoginDTO {
         private long id;
         private String email;
         private String fullName;
+        private String role;
     }
 
 

@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./providers"; // Phải là default import
+import { UserProvider } from "./context/UserContext";
 
 export const metadata: Metadata = {
   title: "Shoes Online Store",
@@ -22,9 +23,11 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <UserProvider>
         <Providers>
           <main>{children}</main>
         </Providers>
+        </UserProvider>
       </body>
     </html>
   );

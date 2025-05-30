@@ -1,165 +1,134 @@
 // services/productService.ts
-import { ProductDTO } from "../types/dto/ProductDTO";
-import { Product } from "../types/product";
+import { fetchWithTokenRefresh } from './apiService';
+import { Product } from '../types/product';
 
-const API_URL = 'http://localhost:8080/admin/products'
+const API_URL = 'http://localhost:8080/admin/products';
 
 interface ProductListResponse {
-    content: Product[];
-    page: number;
-    totalElements: number;
-    totalPages: number;
+  content: Product[];
+  page: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 
-
+// Lấy danh sách sản phẩm
 export async function getAllProducts(page: number = 0, size: number = 10): Promise<ProductListResponse> {
-    try {
-        const res = await fetch(`${API_URL}?page=${page}&size=${size}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            next: { revalidate: 0 },
-        });
-
-        if (res.status === 204) {
-            return {
-                content: [], 
-                page: page,
-                totalElements: 0,
-                totalPages: 0
-            };
-        }
-        if (!res.ok) {
-            throw new Error(`Error ${res.status}: ${res.statusText}`);
-        }
-        // return res.json();
-        const text = await res.text();
-        const data = text ? JSON.parse(text) : { content: [], page: 0, totalElements: 0, totalPages: 0 };
-        return data
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-    }
-}
-
-// Lấy sản phẩm theo ID
-export async function getProductById(id: number): Promise<Product> {
   try {
-    const res = await fetch(`${API_URL}/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      next: { revalidate: 0 },
-    });
+    const data = await fetchWithTokenRefresh<ProductListResponse>(
+      `${API_URL}?page=${page}&size=${size}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      }
+    );
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || `Không thể lấy thông tin sản phẩm với id ${id}`);
+    // Xử lý trường hợp không có dữ liệu (status 204)
+    if (!data.content) {
+      return {
+        content: [],
+        page,
+        totalElements: 0,
+        totalPages: 0,
+      };
     }
 
-    const response = await res.json();
-    return response.data; // Trích xuất trường data
+    return data;
   } catch (error) {
-    console.error(`Error fetching product with id ${id}:`, error);
+    console.error('Lỗi khi lấy danh sách sản phẩm:', error);
     throw error;
   }
 }
 
+// Lấy sản phẩm theo ID
+// services/productService.ts
+export async function getProductById(id: number): Promise<Product> {
+  try {
+    // Bỏ generic <ApiResponse<Product>> vì fetchWithTokenRefresh đã xử lý
+    const product = await fetchWithTokenRefresh<Product>(
+      `${API_URL}/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      }
+    );
+
+    if (!product) {
+      throw new Error(`Sản phẩm với ID ${id} không tồn tại`);
+    }
+
+    return product;
+  } catch (error) {
+    console.error(`Lỗi khi lấy sản phẩm với ID ${id}:`, error);
+    throw error;
+  }
+}
 // Tạo sản phẩm mới
 export async function createProduct(productData: FormData): Promise<Product> {
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            body: productData,
-            
-            next: { revalidate: 0 },
-        });
-
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || 'Failed to create product');
-        }
-
-        return res.json();
-    } catch (error) {
-        console.error('Error creating product:', error);
-        throw error;
-    }
+  try {
+    const response = await fetchWithTokenRefresh<{ data: Product }>(
+      API_URL,
+      {
+        method: 'POST',
+        body: productData,
+        credentials: 'include',
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi tạo sản phẩm:', error);
+    throw error;
+  }
 }
 
 // Cập nhật sản phẩm
-export async function updateProduct(id: number, productData: ProductDTO, imageFile?: File) {
-    const formData = new FormData();
-    formData.append('product', new Blob([JSON.stringify(productData)], {
-        type: 'application/json'  // Rõ ràng hơn về kiểu dữ liệu
-    }));
-    
-    if (imageFile) {
-        formData.append('image', imageFile);
-    }
+export async function updateProduct(id: number, productData: Product, imageFile?: File): Promise<Product> {
+  const formData = new FormData();
+  formData.append(
+    'product',
+    new Blob([JSON.stringify(productData)], {
+      type: 'application/json',
+    })
+  );
 
-    const res = await fetch(`${API_URL}/${id}`, {
+  if (imageFile) {
+    formData.append('image', imageFile);
+  }
+
+  try {
+    const response = await fetchWithTokenRefresh<{ data: Product }>(
+      `${API_URL}/${id}`,
+      {
         method: 'PATCH',
         body: formData,
-    });
-
-    if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.message || `Failed to update product with id ${id}`);
-    }
-
-    return res.json();
+        credentials: 'include',
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Lỗi khi cập nhật sản phẩm với id ${id}:`, error);
+    throw error;
+  }
 }
 
-
-export async function updateProductWithImage(id: number, formData: FormData) {
-    const res = await fetch(`${API_URL}/${id}/upload`, {
-        method: 'POST',
-        body: formData,
-    });
-
-    if (!res.ok) {
-        let errorMessage = `Failed to update product image with id ${id}`;
-        try {
-            const errorData = await res.json();
-            errorMessage = errorData.message || errorMessage;
-        } catch (_) {}
-        throw new Error(errorMessage);
-    }
-
-    return res.json();
-}
-
-
-// Xóa sản phẩm (nếu cần)
+// Xóa sản phẩm
 export async function deleteProduct(id: number): Promise<void> {
-    try {
-        const res = await fetch(`${API_URL}/${id}`, {
-            method: 'DELETE',
-            credentials: 'include',
-            next: { revalidate: 0 },
-        });
-
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || `Failed to delete product with id ${id}`);
-        }
-    } catch (error) {
-        console.error(`Error deleting product with id ${id}:`, error);
-        throw error;
-    }
+  try {
+    await fetchWithTokenRefresh<void>(
+      `${API_URL}/${id}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      }
+    );
+  } catch (error) {
+    console.error(`Lỗi khi xóa sản phẩm với id ${id}:`, error);
+    throw error;
+  }
 }
-// export async function getRandomProducts(count: number = 10): Promise<Product[]> {
-//   try {
-//     const allProducts = await getAllProducts(0, 100);
-    
-//     const shuffled = [...allProducts.content].sort(() => 0.5 - Math.random());
-//     return shuffled.slice(0, count);
-//   } catch (error) {
-//     console.error('Error fetching random products:', error);
-//     throw error;
-//   }
-// }

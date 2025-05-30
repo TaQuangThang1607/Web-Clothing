@@ -38,30 +38,36 @@ export default function ProductTable({ products, currentPage, totalPages, onPage
             <th className="border p-2">hanh dong</th>
           </tr>
         </thead>
-        <tbody>
-          {products.map(p => (
-            <tr key={p.id}>
-              <td className="border p-2">{p.id}</td>
-              <td className="border p-2">{p.name}</td>
-              <td className="border p-2">{p.price}</td>
-              <td className="border p-2">{p.size}</td>
-              <td className="border p-2">{p.color}</td>
-              <td className="border p-2">
-                <Link href={`/admin/products/update/${p.id}`} className="text-blue-500 hover:underline mr-2">
-                  Chỉnh sửa
-                </Link>
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  className="text-red-500 hover:underline"
-                >
-                  Xóa
-                </button>
-              </td>
 
-              
-            </tr>
-          ))}
-        </tbody>
+<tbody>
+  {products && products.length > 0 ? (
+    products.map(p => (
+      <tr key={p.id}>
+        <td className="border p-2">{p.id}</td>
+        <td className="border p-2">{p.name}</td>
+        <td className="border p-2">{p.price}</td>
+        <td className="border p-2">{p.size}</td>
+        <td className="border p-2">{p.color}</td>
+        <td className="border p-2">
+          <Link href={`/admin/products/update/${p.id}`} className="text-blue-500 hover:underline mr-2">
+            Chỉnh sửa
+          </Link>
+          <button
+            onClick={() => handleDelete(p.id)}
+            className="text-red-500 hover:underline"
+          >
+            Xóa
+          </button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan={6} className="text-center p-4">Không có sản phẩm nào.</td>
+    </tr>
+  )}
+</tbody>
+
       </table>
       <div className="mt-4 flex justify-center space-x-2">
         <button

@@ -1,4 +1,4 @@
-import { Role } from "./Role";
+import { Role } from "./role";
 
 //app/types/user.tsx
 export interface User{

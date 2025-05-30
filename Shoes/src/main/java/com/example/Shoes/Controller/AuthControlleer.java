@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -84,26 +85,30 @@ public class AuthControlleer {
     }
 
     
-    @GetMapping("/auth/account")
+   @GetMapping("/auth/account")
     public ResponseEntity<RestLoginDTO.UserGetAccount> getAccount() {
-        String email = SecurityUtil.getCurrentUserLogin().isPresent()
-                        ? SecurityUtil.getCurrentUserLogin().get()
-                        : "";
+        Optional<String> emailOpt = SecurityUtil.getCurrentUserLogin();
         
-        User currentUserDB = this.userService.handleGetUserByEmail(email);
-        RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin();
-        RestLoginDTO.UserGetAccount userGetAccount = new RestLoginDTO.UserGetAccount();
-        
-        if(currentUserDB != null){
-            userLogin.setId(currentUserDB.getId());
-            userLogin.setEmail(currentUserDB.getEmail());
-            userLogin.setFullName(currentUserDB.getFullName());
-            userGetAccount.setUser(userLogin);
+        if (emailOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-       
-
-        return ResponseEntity.ok().body(userGetAccount);
+        
+        User currentUserDB = this.userService.handleGetUserByEmail(emailOpt.get());
+        
+        if (currentUserDB == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(
+            currentUserDB.getId(),
+            currentUserDB.getEmail(),
+            currentUserDB.getFullName()
+        );
+        
+        RestLoginDTO.UserGetAccount userGetAccount = new RestLoginDTO.UserGetAccount();
+        userGetAccount.setUser(userLogin);
+        
+        return ResponseEntity.ok(userGetAccount);
     }
 
 

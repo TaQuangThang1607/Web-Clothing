@@ -82,6 +82,7 @@ export default function Header() {
           ) : (
             <a href="/login" className="text-gray-700">Login</a>
           )}
+
           <a href="#" className="text-gray-700">Cart</a>
         </div>
       </div>

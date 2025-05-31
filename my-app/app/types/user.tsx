@@ -8,6 +8,6 @@ export interface User{
     fullName:string;
     phone:string;
     address:string;
-    role?:Role;
+    role:Role;
 }
 

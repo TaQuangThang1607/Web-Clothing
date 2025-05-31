@@ -1,6 +1,8 @@
 package com.example.Shoes.Controller.Admin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,8 +66,6 @@ public class UserController {
             throw new IdInvalidException("Email: " + dto.getEmail() + "email đã tồn tại");
         }
 
-
-
         String hashPassword = passwordEncoder.encode(dto.getPassword());
         dto.setPassword(hashPassword);
         UserDTO userDTO = userService.createUser(dto);
@@ -72,9 +73,11 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUserById(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteUserById(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok("User deleted successfully");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Product deleted successfully");
+        return ResponseEntity.ok(response);
     }
 
     private List<String> getValidationErrors(BindingResult bindingResult) {
@@ -82,4 +85,32 @@ public class UserController {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        UserDTO userDTO = userService.getUserById(id);
+        if (userDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(
+        @PathVariable Long id,
+        @RequestBody UserDTO dto,
+        BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest()
+                    .body(getValidationErrors(bindingResult));
+        }
+
+
+        
+        UserDTO updatedUser = userService.updateUser(id, dto);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+
 }

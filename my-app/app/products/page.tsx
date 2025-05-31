@@ -4,7 +4,8 @@ import FooterPage from "../components/Footer"
 import Header from "../components/Header"
 import { getAllPageProducts } from "../services/client/viewpageProduct"
 import { ProductDTO } from "../types/dto/ProductDTO"
-
+import Link from "next/link"
+// app/products/page.tsx
 export default function ListProducts() {
     const [products, setProducts] = useState<ProductDTO[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<ProductDTO[]>([])
@@ -13,7 +14,7 @@ export default function ListProducts() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
-    const [searchTerm, setSearchTerm] = useState("") // Thêm state cho từ khóa tìm kiếm
+    const [searchTerm, setSearchTerm] = useState("")
 
     const brands = [
         { name: "Nike", count: 0 },
@@ -104,9 +105,9 @@ export default function ListProducts() {
         )
     }
 
+    
     return (
         <>
-            <Header />
             <div className="bg-white py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <h1 className="text-3xl font-bold text-gray-900 mb-6">Shoes</h1>
@@ -205,6 +206,8 @@ export default function ListProducts() {
                                 <div className="lg:col-span-9">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {filteredProducts.map((product) => (
+                                            <Link href={`/products/${product.id}`} key={product.id}>
+                                                
                                             <div key={product.id} className="relative rounded-lg shadow-md overflow-hidden">
                                                 <div className="relative">
                                                     <img 
@@ -226,15 +229,15 @@ export default function ListProducts() {
                                                                 ? Number(product.price).toFixed(2) 
                                                                 : 'N/A'} đ / {product.size}
                                                         </p>
-                                                        <a href="#" className="bg-white border border-gray-300 text-blue-500 px-3 py-2 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center">
                                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                                             </svg>
                                                             Add to cart
-                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
+                                                </Link>
+
                                         ))}
                                         {filteredProducts.length === 0 && (
                                             <div className="col-span-3 text-center py-10">
@@ -275,7 +278,6 @@ export default function ListProducts() {
                     </div>
                 </div>
             </div>
-            <FooterPage />
         </>
     )
 }

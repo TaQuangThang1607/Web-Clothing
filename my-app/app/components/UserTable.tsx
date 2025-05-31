@@ -15,7 +15,7 @@ export default function UserTable({ users, currentPage, totalPages, onPageChange
         if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
           try {
             await deleteUser(id);
-            onPageChange(currentPage); // Làm mới trang
+            onPageChange(currentPage);
             alert('Xóa sản phẩm thành công!');
           } catch (error) {
             alert('Lỗi khi xóa sản phẩm');

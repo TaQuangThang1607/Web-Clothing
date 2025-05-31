@@ -1,4 +1,8 @@
 import { ProductDTO } from "@/app/types/dto/ProductDTO";
+import { Product } from "@/app/types/product";
+import { fetchWithTokenRefresh } from "../apiService";
+
+
 const API_URL = 'http://localhost:8080/api/products';
 // app/services/client/viewpageProduct.ts
 export async function getAllPageProducts(): Promise<ProductDTO[]> {
@@ -36,6 +40,29 @@ export async function getAllPageProducts(): Promise<ProductDTO[]> {
         }
     } catch (error) {
         console.error('Fetch error:', error);
-        return []; // Trả về mảng rỗng thay vì throw error
+        return [];
     }
+}
+export async function getProductById(id: number): Promise<Product> {
+  try {
+    const product = await fetchWithTokenRefresh<Product>(
+      `${API_URL}/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      }
+    );
+
+    if (!product) {
+      throw new Error(`Sản phẩm với ID ${id} không tồn tại`);
+    }
+
+    return product;
+  } catch (error) {
+    console.error(`Lỗi khi lấy sản phẩm với ID ${id}:`, error);
+    throw error;
+  }
 }

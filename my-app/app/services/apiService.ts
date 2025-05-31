@@ -25,8 +25,10 @@ interface AccountData {
 }
 
 export async function fetchWithTokenRefresh<T>(url: string, options: RequestInit): Promise<T> {
+  
+  
   const accessToken = localStorage.getItem('access_token');
-    const isFormData = options.body instanceof FormData;
+  const isFormData = options.body instanceof FormData;
 
   const headers = {
     ...options.headers,

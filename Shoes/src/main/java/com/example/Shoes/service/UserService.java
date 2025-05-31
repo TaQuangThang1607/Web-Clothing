@@ -17,4 +17,6 @@ public interface UserService {
     void updataUserToken(String token, String email);
 
     User getUserByRefreshTokenAndEmail(String token, String email);
+    UserDTO updateUser(Long id, UserDTO dto);
+
 }

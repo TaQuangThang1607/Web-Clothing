@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.Shoes.Model.Role;
 import com.example.Shoes.Model.User;
 import com.example.Shoes.Model.dto.UserDTO;
 import com.example.Shoes.Model.mapper.UserMapper;
@@ -70,6 +71,30 @@ public class UserServiceImpl implements UserService{
     public User getUserByRefreshTokenAndEmail(String token, String email) {
         return this.userRepository.findByRefreshTokenAndEmail(token, email);
     }
+
+   @Override
+    public UserDTO updateUser(Long id, UserDTO dto) {
+        User existingUser = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        existingUser.setFullName(dto.getFullName());
+        existingUser.setPhone(dto.getPhone());
+        existingUser.setAddress(dto.getAddress());
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            existingUser.setPassword(dto.getPassword());
+        }
+
+        if (dto.getRoleId() != null) {
+            Role role = new Role();
+            role.setId(dto.getRoleId());
+            existingUser.setRole(role);
+        }
+
+        User updatedUser = userRepository.save(existingUser);
+        return userMapper.toDto(updatedUser);
+    }
+
 
     
 }

@@ -47,7 +47,6 @@ export async function getAllProducts(page: number = 0, size: number = 10): Promi
 // services/productService.ts
 export async function getProductById(id: number): Promise<Product> {
   try {
-    // Bỏ generic <ApiResponse<Product>> vì fetchWithTokenRefresh đã xử lý
     const product = await fetchWithTokenRefresh<Product>(
       `${API_URL}/${id}`,
       {

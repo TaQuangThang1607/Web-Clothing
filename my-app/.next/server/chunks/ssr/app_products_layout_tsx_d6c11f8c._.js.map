@@ -2,5 +2,5 @@
   "version": 3,
   "sources": [],
   "sections": [
-    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}}]
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///D:/react%2Bspring/Web-Clothing/my-app/app/products/layout.tsx"],"sourcesContent":["import FooterPage from \"../components/Footer\";\r\nimport Header from \"../components/Header\";\r\n\r\nexport default function ProductsPageLayout({ children }: { children: React.ReactNode }) {\r\n\r\n\r\n    return (\r\n        <div className=\"flex flex-col min-h-screen\">\r\n          <div className=\"flex flex-1\">\r\n            <main className=\"flex-1 p-6 bg-gray-100\">{children}</main>\r\n          </div>\r\n        </div>\r\n      );\r\n}\r\n"],"names":[],"mappings":";;;;;AAGe,SAAS,mBAAmB,EAAE,QAAQ,EAAiC;IAGlF,qBACI,8OAAC;QAAI,WAAU;kBACb,cAAA,8OAAC;YAAI,WAAU;sBACb,cAAA,8OAAC;gBAAK,WAAU;0BAA0B;;;;;;;;;;;;;;;;AAItD","debugId":null}}]
 }

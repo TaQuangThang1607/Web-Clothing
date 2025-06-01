@@ -1,13 +1,12 @@
 package com.example.Shoes.Model.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 @Data
 public class ProductDTO {
-
     private Long id;
 
     @NotBlank(message = "Name is mandatory")
@@ -26,9 +25,17 @@ public class ProductDTO {
     private String color;
 
     @NotNull(message = "Price is mandatory")
-    @Positive(message = "Price must be positive")
+    @Min(value = 0, message = "Price must be non-negative")
     private Double price;
 
     private String imageUrl;
+
+    @Size(max = 50, message = "Brand must be less than 50 characters")
     private String brand;
+
+    @Min(value = 0, message = "Quantity must be non-negative")
+    private int quantity;
+
+    @Min(value = 0, message = "Sold quantity must be non-negative")
+    private int sold;
 }

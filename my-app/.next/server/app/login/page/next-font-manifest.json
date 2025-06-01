@@ -1,6 +1,8 @@
 {
   "pages": {},
-  "app": {},
-  "appUsingSizeAdjust": false,
+  "app": {
+    "[project]/app/login/page": []
+  },
+  "appUsingSizeAdjust": true,
   "pagesUsingSizeAdjust": false
 }

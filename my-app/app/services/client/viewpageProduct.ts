@@ -1,68 +1,57 @@
-import { ProductDTO } from "@/app/types/dto/ProductDTO";
+import { PageResponse } from "@/app/types/dto/apiResponse";
 import { Product } from "@/app/types/product";
-import { fetchWithTokenRefresh } from "../apiService";
+import { getAllProductsInClient } from "./clientService";
 
+export async function getAllPageProducts(
+  page: number = 0,
+  size: number = 9,
+  sort: string = 'name,asc',
+  search: string = '',
+  brand: string = '',
+  minPrice?: number,
+  maxPrice?: number
+): Promise<PageResponse<Product>> {
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    size: size.toString(),
+    sort,
+    ...(search && { search }),
+    ...(brand && { brand }),
+    ...(minPrice !== undefined && { minPrice: minPrice.toString() }),
+    ...(maxPrice !== undefined && { maxPrice: maxPrice.toString() }),
+  });
 
-const API_URL = 'http://localhost:8080/api/products';
-// app/services/client/viewpageProduct.ts
-export async function getAllPageProducts(): Promise<ProductDTO[]> {
-    try {
-        console.log('Fetching from:', API_URL); // Log URL
-        const res = await fetch(API_URL);
-        
-        console.log('Response status:', res.status);
-        const textData = await res.text();
-        console.log('Raw response text:', textData); // Log raw response
-        
-        try {
-            const data = JSON.parse(textData);
-            console.log('Parsed JSON data:', data); // Log parsed data
-            
-            // Thử tất cả các trường hợp có thể
-            if (Array.isArray(data)) {
-                return data as ProductDTO[];
-            } else if (data?.content && Array.isArray(data.content)) {
-                return data.content as ProductDTO[];
-            } else if (data?.data && Array.isArray(data.data)) {
-                return data.data as ProductDTO[];
-            } else if (data?.items && Array.isArray(data.items)) {
-                return data.items as ProductDTO[];
-            } else if (data?.products && Array.isArray(data.products)) {
-                return data.products as ProductDTO[];
-            }
-            
-            console.warn('Unknown data structure:', data);
-            return []; // Trả về mảng rỗng thay vì throw error
-            
-        } catch (jsonError) {
-            console.error('JSON parse error:', jsonError);
-            return [];
-        }
-    } catch (error) {
-        console.error('Fetch error:', error);
-        return [];
-    }
+  return getAllProductsInClient(page, size, sort, queryParams.toString());
 }
-export async function getProductById(id: number): Promise<Product> {
-  try {
-    const product = await fetchWithTokenRefresh<Product>(
-      `${API_URL}/${id}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      }
-    );
 
-    if (!product) {
-      throw new Error(`Sản phẩm với ID ${id} không tồn tại`);
+export async function getBrandsCount(
+  search: string = '',
+  minPrice?: number,
+  maxPrice?: number
+): Promise<Map<string, number>> {
+  const queryParams = new URLSearchParams({
+    ...(search && { search }),
+    ...(minPrice !== undefined && { minPrice: minPrice.toString() }),
+    ...(maxPrice !== undefined && { maxPrice: maxPrice.toString() }),
+  });
+
+  try {
+    const response = await fetch(`http://localhost:8080/api/products/brands-count?${queryParams}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return product;
+    const result = await response.json();
+    return new Map(Object.entries(result));
   } catch (error) {
-    console.error(`Lỗi khi lấy sản phẩm với ID ${id}:`, error);
+    console.error('Error fetching brands count:', error);
     throw error;
   }
 }

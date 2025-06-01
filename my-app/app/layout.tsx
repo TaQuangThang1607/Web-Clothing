@@ -1,33 +1,39 @@
-// app/layout.tsx
-import type { Metadata } from "next";
-import "./globals.css";
-import Providers from "./providers"; // Phải là default import
-import { UserProvider } from "./context/UserContext";
+import type { Metadata } from 'next';
+import './globals.css';
+import { UserProvider } from './context/UserContext';
+import { CartProvider } from './context/CartContextType';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import Header from './components/Header';
+import FooterPage from './components/Footer';
 
 export const metadata: Metadata = {
-  title: "Shoes Online Store",
-  description: "Cửa hàng bán giày",
+  title: 'Cửa hàng giày trực tuyến',
+  description: 'Cửa hàng bán giày chất lượng cao',
+  viewport: 'width=device-width, initial-scale=1',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function ErrorFallback({ error }: { error: Error }) {
+  return (
+    <div className="flex justify-center items-center h-screen text-red-500">
+      <p>Có lỗi xảy ra: {error.message}</p>
+    </div>
+  );
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        />
-      </head>
       <body className="antialiased">
-        <UserProvider>
-        <Providers>
-          <main>{children}</main>
-        </Providers>
-        </UserProvider>
+          <UserProvider>
+            <CartProvider>
+                <Header />
+                <main className="min-h-screen">{children}</main>
+                <FooterPage />
+                <ToastContainer position="top-right" autoClose={3000} />
+            </CartProvider>
+          </UserProvider>
       </body>
     </html>
   );

@@ -53,6 +53,8 @@ public class ProductController {
             productPage.getTotalPages()
         ));
     }
+
+    
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createProduct(
             @RequestPart("product") @Valid ProductDTO dto,

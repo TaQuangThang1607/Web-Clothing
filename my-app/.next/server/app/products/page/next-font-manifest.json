@@ -1,6 +1,8 @@
 {
   "pages": {},
-  "app": {},
-  "appUsingSizeAdjust": false,
+  "app": {
+    "[project]/app/products/page": []
+  },
+  "appUsingSizeAdjust": true,
   "pagesUsingSizeAdjust": false
 }

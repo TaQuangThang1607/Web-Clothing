@@ -1,7 +1,7 @@
 'use client';
 
 import { getProductById, updateProduct } from '@/app/services/productService';
-import { ProductDTO } from '@/app/types/dto/ProductDTO';
+import { ProductDTO } from '@/app/types/dto/apiResponse';
 import { useRouter, useParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { fetchWithTokenRefresh } from '@/app/services/apiService';

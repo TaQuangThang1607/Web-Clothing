@@ -1,7 +1,7 @@
 'use client';
 
 import { createProduct } from "@/app/services/productService";
-import { ProductDTO } from "@/app/types/dto/ProductDTO";
+import { ProductDTO } from "@/app/types/dto/apiResponse";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";

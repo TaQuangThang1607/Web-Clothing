@@ -1,19 +1,25 @@
 package com.example.Shoes.Controller;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.Shoes.Model.dto.ProductDTO;
 import com.example.Shoes.Service.ProductService;
+import com.example.Shoes.utils.exception.ResourceNotFoundException;
+
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.constraints.Positive;
+
 
 @RestController
 @RequestMapping("/api")
 public class HomeController {
+    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
     private final ProductService productService;
 
@@ -21,17 +27,34 @@ public class HomeController {
         this.productService = productService;
     }
 
-
     @GetMapping("/products")
-    public ResponseEntity<List<ProductDTO>> getallProduct(){
-        
-        List<ProductDTO> list = this.productService.fetchAllProduct();
-        return ResponseEntity.ok().body(list);
+    public Page<ProductDTO> getAllProducts(
+        Pageable pageable,
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) String brand,
+        @RequestParam(required = false) Double minPrice,
+        @RequestParam(required = false) Double maxPrice
+    ) {
+        return productService.getAllProductsAndFilter(pageable, search, brand, minPrice, maxPrice);
     }
-    
+
     @GetMapping("/products/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
-        ProductDTO product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable @Positive(message = "ID must be positive") Long id) {
+        logger.info("Fetching product with id: {}", id);
+        try {
+            ProductDTO product = productService.getProductById(id);
+            return ResponseEntity.ok(product);
+        } catch (ResourceNotFoundException e) {
+            logger.error("Product not found with id: {}", id);
+            throw e;
+        }
+    }
+    @GetMapping("/products/brands-count")
+    public Map<String, Long> getBrandsCount(
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) Double minPrice,
+        @RequestParam(required = false) Double maxPrice
+    ) {
+        return productService.getBrandsCount(search, minPrice, maxPrice);
     }
 }

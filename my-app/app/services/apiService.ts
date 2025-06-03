@@ -1,12 +1,7 @@
+import { User } from "../types/user";
+
 // services/apiService.ts
 const API_URL = 'http://localhost:8080/api/v1/auth';
-
-interface User {
-  id: number;
-  email: string;
-  fullName: string;
-  role: string;
-}
 
 interface ApiResponse<T> {
   status: number;

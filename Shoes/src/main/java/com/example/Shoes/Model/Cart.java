@@ -1,8 +1,10 @@
 package com.example.Shoes.Model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,10 +38,13 @@ public class Cart {
     private User user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartDetail> cartDetails;
+    private List<CartDetail> cartDetails = new ArrayList<>();;
+
+    @Column(name = "sum", nullable = false)
+    private double sum;
 
     @Transient
-    public double getSum() {
+    public double updateSum() {
         return cartDetails.stream()
             .mapToDouble(detail -> detail.getPrice() * detail.getQuantity())
             .sum();

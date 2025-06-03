@@ -1,5 +1,7 @@
+
 'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { getCartApi, addToCartApi, removeFromCartApi, updateCartQuantityApi, clearCartApi, CartDetail } from '../services/client/CartService';
@@ -10,6 +12,7 @@ export default function CartPage() {
   const [cart, setCart] = useState<CartDetail[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Tải giỏ hàng khi component mount
   const fetchCart = async () => {
@@ -62,6 +65,15 @@ export default function CartPage() {
     } catch (err: any) {
       toast.error(err.message || 'Lỗi khi xóa giỏ hàng');
     }
+  };
+
+  // Chuyển hướng đến trang thanh toán
+  const handleCheckout = () => {
+    if (cart.length === 0) {
+      toast.error('Giỏ hàng trống, vui lòng thêm sản phẩm trước khi thanh toán');
+      return;
+    }
+    router.push('/order');
   };
 
   // Tính tổng số lượng và tổng giá
@@ -171,6 +183,7 @@ export default function CartPage() {
         <div>
           <p className="text-xl font-bold">Tổng cộng: ${totalPrice.toFixed(2)}</p>
           <button
+            onClick={handleCheckout}
             className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md"
             disabled={loading}
           >

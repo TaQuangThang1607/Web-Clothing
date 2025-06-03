@@ -6,8 +6,6 @@ import com.example.Shoes.Model.Cart;
 import com.example.Shoes.Model.dto.CartDetailDTO;
 
 public interface CartService {
-    // CartDTO addProductToCart(Long userId, Long productId, int quantity);
-    // void updateCartTotal(Cart cart);
     
     Cart getCartByUserId(Long userId);
     Cart addToCart(Long userId, Long productId, int quantity);

@@ -2,9 +2,12 @@ package com.example.Shoes.Service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.Shoes.Model.Order;
@@ -14,6 +17,7 @@ import com.example.Shoes.Model.Product;
 import com.example.Shoes.Model.User;
 import com.example.Shoes.Model.dto.order.OrderDTO;
 import com.example.Shoes.Model.dto.order.OrderHistory;
+import com.example.Shoes.Model.mapper.OrderMapper;
 import com.example.Shoes.Repository.OrderHistoryRepository;
 import com.example.Shoes.Repository.OrderReposotory;
 import com.example.Shoes.Repository.ProductRepository;
@@ -29,7 +33,7 @@ public class OrderServiceImpl implements OrderService{
     private final ProductRepository productRepository;
     private final OrderReposotory orderRepository;
     private final OrderHistoryRepository orderHistoryRepository;
-
+    private final OrderMapper orderMapper;
 
     @Override
     public Order createOrder(OrderDTO dto, Long userId) {
@@ -52,11 +56,14 @@ public class OrderServiceImpl implements OrderService{
                             .orElseThrow(() -> new RuntimeException("Product not found: " + item.getProductId()));
 
                     OrderDetail detail = new OrderDetail();
+                    if (product.getQuantity() < item.getQuantity()) {
+                            throw new RuntimeException("Insufficient stock for product: " + item.getProductId());
+                        }
                     detail.setOrder(order);
                     detail.setProduct(product);
                     detail.setQuantity(item.getQuantity());
                     detail.setPrice(product.getPrice()); // Lưu giá tại thời điểm đặt hàng
-                    return detail;
+                    return detail;  
                 }).collect(Collectors.toList());
 
         order.setOrderDetails(orderDetails);
@@ -105,7 +112,33 @@ public class OrderServiceImpl implements OrderService{
     
 
     private String generateOrderCode() {
-        return "DH-" + LocalDateTime.now().getYear() + 
+    String code;
+    do {
+        code = "DH-" + LocalDateTime.now().getYear() + 
                String.format("%06d", UUID.randomUUID().toString().hashCode() & 0xffffff);
+    } while (orderRepository.existsByOrderCode(code));
+    return code;
+}
+
+    @Override
+    public List<Order> getOrdersByUserId(Long userId) {
+        return orderRepository.findByUserId(userId);
     }
+
+    @Override
+    public Optional<Order> getOrderById(Long orderId) {
+        return orderRepository.findById(orderId);    
+    }
+
+    @Override
+    public List<OrderHistory> getOrderHistory(Long orderId) {
+        // TODO Auto-generated method stub
+        return orderHistoryRepository.findByOrderId(orderId);    
+    }
+
+    @Override
+    public Page<OrderDTO> getAllOrders(Pageable pageable) {
+       return orderRepository.findAll(pageable).map(orderMapper::toDto);
+    }
+
 }

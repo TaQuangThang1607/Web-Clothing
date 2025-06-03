@@ -17,8 +17,8 @@ export interface CartDetail {
   productId: number;
   productName: string;
   productImageUrl: string | null;
-  size: string | null; // Thêm trường size
-  brand: string | null; // Thêm trường brand
+  size: string | null;
+  brand: string | null;
 }
 
 export async function getCartApi(): Promise<CartDetail[]> {

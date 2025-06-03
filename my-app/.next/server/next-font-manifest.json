@@ -1,6 +1,8 @@
 {
   "app": {
     "[project]/app/_not-found/page": [],
+    "[project]/app/cart/page": [],
+    "[project]/app/login/page": [],
     "[project]/app/page": [],
     "[project]/app/products/page": []
   },

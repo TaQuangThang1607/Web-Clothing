@@ -2,18 +2,6 @@ import { fetchWithTokenRefresh } from "../apiService";
 
 const CART_API_URL = 'http://localhost:8080/api/cart';
 // app/services/client/CartService.ts
-// Interface khớp với response từ API
-interface CartItemDTO {
-  productId: number;
-  productName: string;
-  price: number;
-  productImageUrl: string;
-  quantity: number;
-  id?: number | null;
-  cartId?: number | null;
-}
-
-// Interface cho API response wrapper
 interface ApiResponse<T> {
   status: number;
   error: string | null;
@@ -21,32 +9,27 @@ interface ApiResponse<T> {
   data: T;
 }
 
-// Lấy danh sách các mục trong giỏ hàng
-export const getCart = async (): Promise<CartItemDTO[]> => {
-  try {
-    const response = await fetchWithTokenRefresh<ApiResponse<CartItemDTO[]>>(`${CART_API_URL}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-    console.log('API response in getCart:', response); // Ghi log để kiểm tra
-    if (!response.data || !Array.isArray(response.data)) {
-      console.error('Expected array in response.data, got:', response.data);
-      throw new Error('Invalid cart data from server');
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error in getCart:', error);
-    throw error; // Ném lỗi để xử lý ở syncCartFromServer
-  }
-};
+export interface CartDetail {
+  id: number;
+  cartId: number;
+  quantity: number;
+  price: number;
+  productId: number;
+  productName: string;
+  productImageUrl: string | null;
+  size: string | null; // Thêm trường size
+  brand: string | null; // Thêm trường brand
+}
 
+export async function getCartApi(): Promise<CartDetail[]> {
+  return fetchWithTokenRefresh<CartDetail[]>(`${CART_API_URL}`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+}
 
-// Thêm sản phẩm vào giỏ hàng
-export async function addToCart(productId: number, quantity: number): Promise<CartItemDTO[]> {
-  const response = await fetchWithTokenRefresh<ApiResponse<CartItemDTO[]>>(`${CART_API_URL}/add`, {
+export async function addToCartApi(productId: number, quantity: number): Promise<CartDetail[]> {
+  return fetchWithTokenRefresh<CartDetail[]>(`${CART_API_URL}/add`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -54,20 +37,17 @@ export async function addToCart(productId: number, quantity: number): Promise<Ca
     body: JSON.stringify({ productId, quantity }),
     credentials: 'include',
   });
-  return response.data;
 }
 
-// Xóa sản phẩm khỏi giỏ hàng
-export async function removeFromCart(productId: number): Promise<void> {
-  await fetchWithTokenRefresh<void>(`${CART_API_URL}/remove/${productId}`, {
+export async function removeFromCartApi(productId: number): Promise<void> {
+  return fetchWithTokenRefresh<void>(`${CART_API_URL}/remove/${productId}`, {
     method: 'DELETE',
     credentials: 'include',
   });
 }
 
-// Cập nhật số lượng sản phẩm trong giỏ hàng
-export async function updateCartQuantity(productId: number, quantity: number): Promise<void> {
-  await fetchWithTokenRefresh<void>(`${CART_API_URL}/update`, {
+export async function updateCartQuantityApi(productId: number, quantity: number): Promise<void> {
+  return fetchWithTokenRefresh<void>(`${CART_API_URL}/update`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -77,13 +57,9 @@ export async function updateCartQuantity(productId: number, quantity: number): P
   });
 }
 
-// Xóa toàn bộ giỏ hàng
-export async function clearCart(): Promise<void> {
-  await fetchWithTokenRefresh<void>(`${CART_API_URL}/clear`, {
+export async function clearCartApi(): Promise<void> {
+  return fetchWithTokenRefresh<void>(`${CART_API_URL}/clear`, {
     method: 'DELETE',
     credentials: 'include',
   });
 }
-
-// Export interface để sử dụng ở component khác
-export type { CartItemDTO };

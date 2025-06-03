@@ -1,101 +1,183 @@
 'use client';
 import Link from 'next/link';
-import { useCart } from '../context/CartContextType';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { getCartApi, addToCartApi, removeFromCartApi, updateCartQuantityApi, clearCartApi, CartDetail } from '../services/client/CartService';
 
-const API_BASE_URL ='http://localhost:8080';
+const API_BASE_URL = 'http://localhost:8080';
 
 export default function CartPage() {
-  const { cart, removeFromCart, updateQuantity, clearCart, totalItems } = useCart();
+  const [cart, setCart] = useState<CartDetail[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const totalPrice = cart.reduce(
-    (total, item) => total + (item.product.price || 0) * item.quantity,
-    0
-  );
+  // Tải giỏ hàng khi component mount
+  const fetchCart = async () => {
+    setLoading(true);
+    try {
+      const cartItems = await getCartApi();
+      setCart(cartItems);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || 'Lỗi khi tải giỏ hàng');
+      toast.error(err.message || 'Lỗi khi tải giỏ hàng');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Xóa sản phẩm khỏi giỏ hàng
+  const handleRemoveFromCart = async (productId: number) => {
+    try {
+      await removeFromCartApi(productId);
+      setCart(cart.filter(item => item.productId !== productId));
+      toast.success('Đã xóa sản phẩm khỏi giỏ hàng');
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi xóa sản phẩm');
+    }
+  };
+
+  // Cập nhật số lượng sản phẩm
+  const handleUpdateQuantity = async (productId: number, quantity: number) => {
+    if (quantity < 1) {
+      handleRemoveFromCart(productId);
+      return;
+    }
+    try {
+      await updateCartQuantityApi(productId, quantity);
+      const updatedCart = await getCartApi();
+      setCart(updatedCart);
+      toast.success('Đã cập nhật số lượng');
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi cập nhật số lượng');
+    }
+  };
+
+  // Xóa toàn bộ giỏ hàng
+  const handleClearCart = async () => {
+    try {
+      await clearCartApi();
+      setCart([]);
+      toast.success('Đã xóa toàn bộ giỏ hàng');
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi xóa giỏ hàng');
+    }
+  };
+
+  // Tính tổng số lượng và tổng giá
+  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+  const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Đang tải...</h1>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Lỗi</h1>
+        <p className="text-red-500 text-lg">{error}</p>
+        <button
+          onClick={fetchCart}
+          className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md"
+        >
+          Thử lại
+        </button>
+      </div>
+    );
+  }
 
   if (cart.length === 0) {
     return (
-      <>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Cart</h1>
-          <p className="text-gray-500 text-lg">Your cart is empty.</p>
-          <Link href="/products">
-            <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md">
-              Continue Shopping
-            </button>
-          </Link>
-        </div>
-      </>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Giỏ hàng của bạn</h1>
+        <p className="text-gray-500 text-lg">Giỏ hàng của bạn đang trống.</p>
+        <Link href="/products">
+          <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md">
+            Tiếp tục mua sắm
+          </button>
+        </Link>
+      </div>
     );
   }
 
   return (
-    <>
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Cart ({totalItems} items)</h1>
-        <div className="space-y-4">
-          {cart.map((item) => (
-            <div
-              key={item.product.id}
-              className="flex items-center border rounded-lg p-4 shadow-sm"
-            >
-              <img
-                src={item.product.imageUrl?.startsWith('http') ? item.product.imageUrl : `${API_BASE_URL}${item.product.imageUrl || '/placeholder-product.png'}`}
-                alt={item.product.name}
-                className="w-24 h-24 object-cover rounded"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/placeholder-product.png';
-                }}
-              />
-              <div className="ml-4 flex-grow">
-                <h2 className="text-lg font-semibold">{item.product.name}</h2>
-                <p className="text-gray-600">${item.product.price?.toFixed(2) || 'N/A'}</p>
-                <h2 className="text-lg "> Size: {item.product.size}</h2>
-                <h2 className="text-lg ">Brand: {item.product.brand}</h2>
-
-                
-                
-                <div className="flex items-center mt-2">
-                  <button
-                    onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                    className="px-2 py-1 border rounded"
-                  >
-                    -
-                  </button>
-                  <span className="mx-2">{item.quantity}</span>
-                  <button
-                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                    className="px-2 py-1 border rounded"
-                  >
-                    +
-                  </button>
-                  <button
-                    onClick={() => removeFromCart(item.product.id)}
-                    className="ml-4 text-red-500 hover:text-red-700"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-              <p className="font-bold">${((item.product.price || 0) * item.quantity).toFixed(2)}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-8 flex justify-between items-center">
-          <button
-            onClick={clearCart}
-            className="text-red-500 hover:text-red-700"
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">Giỏ hàng của bạn ({totalItems} sản phẩm)</h1>
+      <div className="space-y-4">
+        {cart.map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center border rounded-lg p-4 shadow-sm"
           >
-            Clear Cart
-          </button>
-          <div>
-            <p className="text-xl font-bold">Total: ${totalPrice.toFixed(2)}</p>
-            <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md">
-              Proceed to Checkout
-            </button>
+            <img
+              src={item.productImageUrl?.startsWith('http') ? item.productImageUrl : `${API_BASE_URL}${item.productImageUrl || '/placeholder-product.png'}`}
+              alt={item.productName}
+              className="w-24 h-24 object-cover rounded"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/placeholder-product.png';
+              }}
+            />
+            <div className="ml-4 flex-grow">
+              <h2 className="text-lg font-semibold">{item.productName}</h2>
+              <p className="text-gray-600">${item.price.toFixed(2)}</p>
+              <h2 className="text-lg">Kích cỡ: {item.size || 'N/A'}</h2>
+              <h2 className="text-lg">Thương hiệu: {item.brand || 'N/A'}</h2>
+              <div className="flex items-center mt-2">
+                <button
+                  onClick={() => handleUpdateQuantity(item.productId, item.quantity - 1)}
+                  className="px-2 py-1 border rounded"
+                  disabled={loading}
+                >
+                  -
+                </button>
+                <span className="mx-2">{item.quantity}</span>
+                <button
+                  onClick={() => handleUpdateQuantity(item.productId, item.quantity + 1)}
+                  className="px-2 py-1 border rounded"
+                  disabled={loading}
+                >
+                  +
+                </button>
+                <button
+                  onClick={() => handleRemoveFromCart(item.productId)}
+                  className="ml-4 text-red-500 hover:text-red-700"
+                  disabled={loading}
+                >
+                  Xóa
+                </button>
+              </div>
+            </div>
+            <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
           </div>
+        ))}
+      </div>
+      <div className="mt-8 flex justify-between items-center">
+        <button
+          onClick={handleClearCart}
+          className="text-red-500 hover:text-red-700"
+          disabled={loading}
+        >
+          Xóa toàn bộ giỏ hàng
+        </button>
+        <div>
+          <p className="text-xl font-bold">Tổng cộng: ${totalPrice.toFixed(2)}</p>
+          <button
+            className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md"
+            disabled={loading}
+          >
+            Tiến hành thanh toán
+          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -14,6 +14,8 @@ public interface CartDetailMapper {
     @Mapping(source = "product.id", target = "productId")
     @Mapping(source = "product.name", target = "productName", defaultValue = "")
     @Mapping(source = "product.imageUrl", target = "productImageUrl", defaultValue = "")
+    @Mapping(source = "product.brand", target = "brand", defaultValue = "")
+    @Mapping(source = "product.size", target = "size", defaultValue = "")
     @Mapping(source = "cart.id", target = "cartId")
     CartDetailDTO toCartDetailDTO(CartDetail cartDetail);
 

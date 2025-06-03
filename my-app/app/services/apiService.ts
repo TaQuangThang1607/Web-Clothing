@@ -32,7 +32,9 @@ export async function fetchWithTokenRefresh<T>(url: string, options: RequestInit
   };
 
   const res = await fetch(url, { ...options, headers, credentials: 'include' });
-
+    if (res.status === 200 && (options.method === 'DELETE' || options.method === 'PUT')) {
+        return undefined as T; 
+    }
   if (res.status === 204) {
     return {
       content: [],

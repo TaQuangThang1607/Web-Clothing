@@ -27,4 +27,7 @@ public class CartDetailDTO {
     private String productName;
 
     private String productImageUrl;
+
+    private String size;
+    private String brand;
 }

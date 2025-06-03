@@ -6,14 +6,14 @@ import debounce from 'lodash/debounce';
 import { PageResponse } from '../types/dto/apiResponse';
 import { Product } from '../types/product';
 import { getAllPageProducts, getBrandsCount } from '../services/client/viewpageProduct';
-import { useCart } from '../context/CartContextType';
+import { addToCartApi } from '../services/client/CartService';
+import { toast } from 'react-toastify';
 
 const API_BASE_URL ='http://localhost:8080';
 // app/products/page.tsx
 export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { addToCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]); // Lưu danh sách đầy đủ
   const [currentPage, setCurrentPage] = useState(0);
@@ -106,10 +106,15 @@ export default function ProductsPage() {
     setCurrentPage(0);
   };
 
-  const handleAddToCart = (product: Product) => {
-  addToCart(product);
-  setAddedToCartIds((prev) => new Set(prev).add(product.id));
-};
+  const handleAddToCart = async (product: Product) => {
+    try {
+      await addToCartApi(product.id, 1);
+      setAddedToCartIds((prev) => new Set(prev).add(product.id));
+      toast.success(`${product.name} đã được thêm vào giỏ hàng`);
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi thêm sản phẩm vào giỏ hàng');
+    }
+  };
 
 
   if (loading) {
@@ -293,6 +298,7 @@ export default function ProductsPage() {
                                   handleAddToCart(product);
                                 }}
                                 className={`flex items-center ${addedToCartIds.has(product.id) ? 'text-green-500' : 'text-blue-500 hover:text-blue-700'}`}
+                                disabled={addedToCartIds.has(product.id)}
                               >
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />

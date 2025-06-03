@@ -1,6 +1,8 @@
 package com.example.Shoes.Service;
 
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,7 +14,7 @@ public interface UserService {
     UserDTO getUserById(Long id);
     void deleteUser (Long id);
     UserDTO createUser(UserDTO dto);
-    User handleGetUserByEmail(String username);
+    Optional<User> handleGetUserByEmail(String username);
     boolean isEmailExist(String email);
     void updataUserToken(String token, String email);
 

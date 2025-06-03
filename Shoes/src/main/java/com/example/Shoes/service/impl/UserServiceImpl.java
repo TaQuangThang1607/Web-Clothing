@@ -1,6 +1,8 @@
 package com.example.Shoes.Service.impl;
 
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -49,7 +51,7 @@ public class UserServiceImpl implements UserService{
     
 
     @Override
-    public User handleGetUserByEmail(String username) {
+    public Optional<User> handleGetUserByEmail(String username) {
          return userRepository.findByEmail(username);
     }
 
@@ -60,10 +62,11 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void updataUserToken(String token, String email) {
-        User currentUser = this.handleGetUserByEmail(email);
-        if(currentUser != null){
-            currentUser.setRefreshToken(token);
-            this.userRepository.save(currentUser);
+        Optional<User> currentUser = this.handleGetUserByEmail(email);
+        if (currentUser.isPresent()) {
+            User user = currentUser.get();
+            user.setRefreshToken(token);
+            this.userRepository.save(user);
         }
     }
 

@@ -9,5 +9,5 @@ export interface Product {
   brand?: string;
   quantity: number;
   size?:number;
-  sold: number;
+  sold?: number;
 }

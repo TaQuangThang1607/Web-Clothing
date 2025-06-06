@@ -28,6 +28,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint{
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
+        
+        if (request.getRequestURI().startsWith("/api/v1/auth/login")) {
+            return; // Để GlobalException xử lý lỗi
+        }
+        
         this.point.commence(request, response, authException);
         response.setContentType("application/json;charset=UTF-8");
 

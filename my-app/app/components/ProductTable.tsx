@@ -1,4 +1,3 @@
-// components/ProductTable.tsx
 import Link from "next/link";
 import { Product } from "../types/product";
 import { deleteProduct } from "../services/productService";
@@ -10,10 +9,7 @@ interface Props {
   onPageChange: (page: number) => void;
 }
 
-
-
 export default function ProductTable({ products, currentPage, totalPages, onPageChange }: Props) {
-
   const handleDelete = async (id: number) => {
     if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
       try {
@@ -25,6 +21,7 @@ export default function ProductTable({ products, currentPage, totalPages, onPage
       }
     }
   };
+
   return (
     <div>
       <table className="w-full border-collapse border border-gray-300 text-black">
@@ -35,39 +32,39 @@ export default function ProductTable({ products, currentPage, totalPages, onPage
             <th className="border p-2">Giá</th>
             <th className="border p-2">Size</th>
             <th className="border p-2">Màu</th>
-            <th className="border p-2">hanh dong</th>
+            <th className="border p-2">Hành động</th>
           </tr>
         </thead>
-
-<tbody>
-  {products && products.length > 0 ? (
-    products.map(p => (
-      <tr key={p.id}>
-        <td className="border p-2">{p.id}</td>
-        <td className="border p-2">{p.name}</td>
-        <td className="border p-2">{p.price}</td>
-        <td className="border p-2">{p.size}</td>
-        <td className="border p-2">{p.color}</td>
-        <td className="border p-2">
-          <Link href={`/admin/products/update/${p.id}`} className="text-blue-500 hover:underline mr-2">
-            Chỉnh sửa
-          </Link>
-          <button
-            onClick={() => handleDelete(p.id)}
-            className="text-red-500 hover:underline"
-          >
-            Xóa
-          </button>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan={6} className="text-center p-4">Không có sản phẩm nào.</td>
-    </tr>
-  )}
-</tbody>
-
+        <tbody>
+          {products && products.length > 0 ? (
+            products.map(p => (
+              <tr key={p.id}>
+                <td className="border p-2">{p.id}</td>
+                <td className="border p-2">{p.name}</td>
+                <td className="border p-2">
+                  {p.price != null ? p.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) : 'N/A'}
+                </td>
+                <td className="border p-2">{p.size}</td>
+                <td className="border p-2">{p.color}</td>
+                <td className="border p-2">
+                  <Link href={`/admin/products/update/${p.id}`} className="text-blue-500 hover:underline mr-2">
+                    Chỉnh sửa
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(p.id)}
+                    className="text-red-500 hover:underline"
+                  >
+                    Xóa
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={6} className="text-center p-4">Không có sản phẩm nào.</td>
+            </tr>
+          )}
+        </tbody>
       </table>
       <div className="mt-4 flex justify-center space-x-2">
         <button

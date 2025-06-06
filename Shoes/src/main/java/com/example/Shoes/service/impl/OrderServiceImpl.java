@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.Shoes.Model.Order;
@@ -33,7 +31,6 @@ public class OrderServiceImpl implements OrderService{
     private final ProductRepository productRepository;
     private final OrderReposotory orderRepository;
     private final OrderHistoryRepository orderHistoryRepository;
-    private final OrderMapper orderMapper;
 
     @Override
     public Order createOrder(OrderDTO dto, Long userId) {
@@ -136,9 +133,6 @@ public class OrderServiceImpl implements OrderService{
         return orderHistoryRepository.findByOrderId(orderId);    
     }
 
-    @Override
-    public Page<OrderDTO> getAllOrders(Pageable pageable) {
-       return orderRepository.findAll(pageable).map(orderMapper::toDto);
-    }
+   
 
 }

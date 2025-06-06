@@ -1,8 +1,6 @@
 {
   "pages": {},
-  "app": {
-    "[project]/app/admin/products/page": []
-  },
-  "appUsingSizeAdjust": true,
+  "app": {},
+  "appUsingSizeAdjust": false,
   "pagesUsingSizeAdjust": false
 }

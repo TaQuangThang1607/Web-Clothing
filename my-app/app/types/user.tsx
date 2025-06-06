@@ -1,4 +1,3 @@
-import { Role } from "./role";
 
 //app/types/user.tsx
 export interface User {
@@ -8,6 +7,6 @@ export interface User {
   fullName?: string;
   phone?: string;
   address?: string;
-  role: Role;
+  role: string;
 }
 

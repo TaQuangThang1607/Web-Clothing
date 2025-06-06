@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { createUser } from "@/app/services/userService";
 import { User } from "@/app/types/user";
 
-// Định nghĩa kiểu cho form data
 type CreateUserFormData = {
   email: string;
   password: string;
@@ -13,7 +12,7 @@ type CreateUserFormData = {
   fullName: string;
   phone: string;
   address: string;
-  role: 'ADMIN' | 'USER'; // Chỉ cho phép 2 role này
+  role: 1 | 2;
 };
 
 export default function CreateUserPage() {
@@ -25,7 +24,7 @@ export default function CreateUserPage() {
     fullName: '',
     phone: '',
     address: '',
-    role: 'USER', // Mặc định là USER
+    role: 2, // Mặc định là USER
   });
 
   const [errors, setErrors] = useState<Partial<CreateUserFormData>>({});
@@ -97,22 +96,16 @@ export default function CreateUserPage() {
     
     try {
       const userToCreate = {
-            email: formData.email,
-            password: formData.password,
-            fullName: formData.fullName,
-            phone: formData.phone,
-            address: formData.address,
-            role: {
-                id: formData.role === 'ADMIN' ? 1 : 2, // Giả sử ADMIN:1, USER:2
-                name: formData.role,
-                description: formData.role === 'ADMIN' ? 'Quản trị hệ thống' : 'Người dùng thông thường'
-            }
-            };
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.fullName,
+        phone: formData.phone,
+        address: formData.address,
+        role: formData.role
+      };
 
-      
       await createUser(userToCreate);
       
-      // Hiển thị thông báo và chuyển hướng sau 2 giây
       setTimeout(() => {
         router.push('/admin/users');
       }, 2000);

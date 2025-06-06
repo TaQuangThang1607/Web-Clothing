@@ -94,7 +94,7 @@ export async function getUserById(id: number): Promise<User> {
 
 export async function updateUser(
   id: number, 
-  userData: Partial<Omit<User, 'id' | 'password'>>
+  userData: Partial<Omit<User, 'id'>> & { password?: string }
 ): Promise<User> {
   try {
     const response = await fetchWithTokenRefresh<User>(

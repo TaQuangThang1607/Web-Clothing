@@ -11,7 +11,7 @@ import { useUser } from '@/app/context/UserContext';
 export default function ProductListPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const [products, setProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(
     parseInt(searchParams.get('page') || '0')
@@ -20,36 +20,8 @@ export default function ProductListPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Kiểm tra quyền ADMIN
-  useEffect(() => {
-    if (!user) {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          const parsedUser = JSON.parse(storedUser);
-          if (parsedUser && typeof parsedUser === 'object' && parsedUser.role === 'ADMIN') {
-            setUser(parsedUser);
-          } else {
-            router.push('/login');
-          }
-        } catch (error) {
-          console.error('Lỗi parse user từ localStorage:', error);
-          localStorage.removeItem('user');
-          localStorage.removeItem('access_token');
-          router.push('/login');
-        }
-      } else {
-        router.push('/login');
-      }
-    } else if (user.role !== 'ADMIN') {
-      router.push('/login');
-    }
-  }, [user, setUser, router]);
-
   // Lấy danh sách sản phẩm
   useEffect(() => {
-    if (!user || user.role !== 'ADMIN') return;
-
     const fetchProducts = async () => {
       setIsLoading(true);
       setError(null);
@@ -65,16 +37,12 @@ export default function ProductListPage() {
       }
     };
     fetchProducts();
-  }, [currentPage, user]);
+  }, [currentPage]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     router.push(`/admin/products?page=${newPage}`);
   };
-
-  if (!user || user.role !== 'ADMIN') {
-    return null; // Không render nếu không phải ADMIN
-  }
 
   return (
     <div className="container mx-auto p-6">

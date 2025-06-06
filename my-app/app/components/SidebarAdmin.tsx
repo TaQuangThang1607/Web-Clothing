@@ -27,9 +27,13 @@ export default function SideBar() {
           <i className="fas fa-table" />
           <span>User</span>
         </a>
+        <a href="/admin/orders" className="flex items-center space-x-2 hover:bg-gray-800 p-2 rounded">
+          <i className="fas fa-table" />
+          <span>Order</span>
+        </a>
       </nav>
       <div className="p-4 border-t border-gray-700 text-sm text-gray-400">
-        <div>Logged in as:</div>
+        <div>Logged in as: THÁNG</div>
         <div>Start Bootstrap</div>
       </div>
     </aside>

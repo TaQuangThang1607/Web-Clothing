@@ -10,8 +10,8 @@ export default function Featurs() {
             <div className="w-16 h-16 flex items-center justify-center bg-green-600 text-white rounded-full mx-auto mb-5">
               <i className="fas fa-car-side fa-2x"></i>
             </div>
-            <h5 className="text-black font-semibold">Free Shipping</h5>
-            <p className="text-sm text-gray-600">Free on order over $300</p>
+            <h5 className="text-black font-semibold">Miễn phí vận chuyển</h5>
+            <p className="text-sm text-gray-600">Miễn phí cho đơn hàng trên 2.000.000 VND</p>
           </div>
 
           {/* Feature 2 */}
@@ -19,8 +19,8 @@ export default function Featurs() {
             <div className="w-16 h-16 flex items-center justify-center bg-green-600 text-white rounded-full mx-auto mb-5">
               <i className="fas fa-user-shield fa-2x"></i>
             </div>
-            <h5 className="text-black font-semibold">Security Payment</h5>
-            <p className="text-sm text-gray-600">100% security payment</p>
+            <h5 className="text-black font-semibold">Thanh toán bảo mật</h5>
+            <p className="text-sm text-gray-600">100% Thanh toán bảo mật</p>
           </div>
 
           {/* Feature 3 */}
@@ -28,8 +28,8 @@ export default function Featurs() {
             <div className="w-16 h-16 flex items-center justify-center bg-green-600 text-white rounded-full mx-auto mb-5">
               <i className="fas fa-exchange-alt fa-2x"></i>
             </div>
-            <h5 className="text-black font-semibold">30 Day Return</h5>
-            <p className="text-sm text-gray-600">30 day money guarantee</p>
+            <h5 className="text-black font-semibold">Trả hàng trong vòng 30 ngày</h5>
+            <p className="text-sm text-gray-600">Đảm bảo hoàn tiền trong 30 ngày</p>
           </div>
 
           {/* Feature 4 */}
@@ -37,8 +37,8 @@ export default function Featurs() {
             <div className="w-16 h-16 flex items-center justify-center bg-green-600 text-white rounded-full mx-auto mb-5">
               <i className="fas fa-phone-alt fa-2x"></i>
             </div>
-            <h5 className="text-black font-semibold">24/7 Support</h5>
-            <p className="text-sm text-gray-600">Support every time fast</p>
+            <h5 className="text-black font-semibold">Hỗ trợ 24/7</h5>
+            <p className="text-sm text-gray-600">Hỗ trợ mọi lúc nhanh chóng</p>
           </div>
         </div>
       </div>

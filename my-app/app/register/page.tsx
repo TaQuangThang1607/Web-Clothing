@@ -1,11 +1,65 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { registerApi } from '@/app/services/apiService';
+
 export default function Register() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    repeatPassword: ''
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError(null); // Xóa lỗi khi người dùng nhập lại
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    setIsLoading(true);
+
+    // Kiểm tra mật khẩu khớp
+    if (formData.password !== formData.repeatPassword) {
+      setError('Mật khẩu không khớp');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await registerApi({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: 2
+      });
+      setSuccess('Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...');
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+    } catch (err: any) {
+      setError(err.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-lg shadow-md">
         <div className="flex flex-col md:flex-row">
           {/* Image Section */}
           <div className="md:w-1/2 flex justify-center items-center mb-8 md:mb-0">
-          <img 
+            <img 
               src="https://i.pinimg.com/736x/76/31/8c/76318cbaebf3351de4065e6f831413f2.jpg" 
               alt="Login illustration" 
               className="w-64 h-auto transform hover:scale-105 transition duration-300"
@@ -14,17 +68,33 @@ export default function Register() {
           
           {/* Form Section */}
           <div className="md:w-1/2">
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <h2 className="text-center text-3xl font-extrabold text-gray-900">
                 Create Account
               </h2>
+
+              {/* Success Message */}
+              {success && (
+                <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+                  {success}
+                </div>
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                  {error}
+                </div>
+              )}
 
               {/* Name Input */}
               <div className="relative">
                 <input 
                   type="text" 
-                  name="name" 
+                  name="fullName" 
                   placeholder="Full Name" 
+                  value={formData.fullName}
+                  onChange={handleChange}
                   className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
@@ -41,6 +111,8 @@ export default function Register() {
                   type="email" 
                   name="email" 
                   placeholder="Email" 
+                  value={formData.email}
+                  onChange={handleChange}
                   className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
@@ -58,6 +130,8 @@ export default function Register() {
                   type="password" 
                   name="password" 
                   placeholder="Password" 
+                  value={formData.password}
+                  onChange={handleChange}
                   className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
@@ -74,6 +148,8 @@ export default function Register() {
                   type="password" 
                   name="repeatPassword" 
                   placeholder="Repeat Password" 
+                  value={formData.repeatPassword}
+                  onChange={handleChange}
                   className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
@@ -88,9 +164,12 @@ export default function Register() {
               <div>
                 <button 
                   type="submit" 
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  disabled={isLoading}
+                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+                    isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                 >
-                  Register
+                  {isLoading ? 'Đang đăng ký...' : 'Register'}
                 </button>
               </div>
 
@@ -109,5 +188,5 @@ export default function Register() {
         </div>
       </div>
     </div>
-  )
+  );
 }

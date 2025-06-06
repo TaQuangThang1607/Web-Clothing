@@ -19,17 +19,29 @@ import com.example.Shoes.Model.RestResponse;
 @RestControllerAdvice
 public class GlobalException {
     @ExceptionHandler(value = {
-           
+            IdInvalidException.class,
             UsernameNotFoundException.class,
             BadCredentialsException.class
     })
 
     // can thiet vao phan handle
     public ResponseEntity<RestResponse<Object>> handleIdException(Exception ex) {
-        RestResponse<Object> res = new RestResponse<Object>();
+        RestResponse<Object> res = new RestResponse<>();
         res.setStatus(HttpStatus.BAD_REQUEST.value());
-        res.setError(ex.getMessage());
-        res.setMessage("IdValidException");
+
+        if (ex instanceof UsernameNotFoundException) {
+            res.setError("Tài khoản không tồn tại");
+            res.setMessage("UsernameNotFoundException");
+        } else if (ex instanceof BadCredentialsException) {
+            res.setError("Mật khẩu không chính xác");
+            res.setMessage("BadCredentialsException");
+        } else if (ex instanceof IdInvalidException) {
+            res.setError(ex.getMessage());
+            res.setMessage("IdInvalidException");
+        } else {
+            res.setError("Đã xảy ra lỗi: " + ex.getMessage());
+            res.setMessage("UnexpectedException");
+        }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }

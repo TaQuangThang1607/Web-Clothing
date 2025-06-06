@@ -37,7 +37,7 @@ export default function Header() {
     setUser(null);
     router.push('/');
   };
-
+const isAdmin = user?.role === 'ADMIN'; // Điều chỉnh dựa trên giá trị role từ API
   return (
     <header className="bg-white shadow">
       <div className="container mx-auto flex justify-between items-center p-4">
@@ -89,12 +89,14 @@ export default function Header() {
       </button>
       {isDropdownOpen && (
         <div className="absolute right-0 mt-2 bg-white shadow-md rounded p-2 z-20 min-w-[160px]">
-          <Link
-            href="/admin/products"
-            className="block px-4 py-2 text-gray-900 hover:bg-gray-100"
-          >
-            Trang quản trị
-          </Link>
+                  {isAdmin && (
+                    <Link
+                      href="/admin/products"
+                      className="block px-4 py-2 text-gray-900 hover:bg-gray-100"
+                    >
+                      Trang quản trị
+                    </Link>
+                  )}
 
           <Link href="/history" className='block px-4 py-2 text-gray-900 hover:bg-gray-100'>
             History

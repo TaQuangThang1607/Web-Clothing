@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { getCartApi, addToCartApi, removeFromCartApi, updateCartQuantityApi, clearCartApi, CartDetail } from '../services/client/CartService';
+import Header from '../components/Header';
+import FooterPage from '../components/Footer';
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -40,7 +42,6 @@ export default function CartPage() {
     }
   };
 
-  // Cập nhật số lượng sản phẩm
   const handleUpdateQuantity = async (productId: number, quantity: number) => {
     if (quantity < 1) {
       handleRemoveFromCart(productId);
@@ -56,7 +57,6 @@ export default function CartPage() {
     }
   };
 
-  // Xóa toàn bộ giỏ hàng
   const handleClearCart = async () => {
     try {
       await clearCartApi();
@@ -122,75 +122,79 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Giỏ hàng của bạn ({totalItems} sản phẩm)</h1>
-      <div className="space-y-4">
-        {cart.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center border rounded-lg p-4 shadow-sm"
-          >
-            <img
-              src={item.productImageUrl?.startsWith('http') ? item.productImageUrl : `${API_BASE_URL}${item.productImageUrl || '/placeholder-product.png'}`}
-              alt={item.productName}
-              className="w-24 h-24 object-cover rounded"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/placeholder-product.png';
-              }}
-            />
-            <div className="ml-4 flex-grow">
-              <h2 className="text-lg font-semibold">{item.productName}</h2>
-              <p className="text-gray-600">${item.price.toFixed(2)}</p>
-              <h2 className="text-lg">Kích cỡ: {item.size || 'N/A'}</h2>
-              <h2 className="text-lg">Thương hiệu: {item.brand || 'N/A'}</h2>
-              <div className="flex items-center mt-2">
-                <button
-                  onClick={() => handleUpdateQuantity(item.productId, item.quantity - 1)}
-                  className="px-2 py-1 border rounded"
-                  disabled={loading}
-                >
-                  -
-                </button>
-                <span className="mx-2">{item.quantity}</span>
-                <button
-                  onClick={() => handleUpdateQuantity(item.productId, item.quantity + 1)}
-                  className="px-2 py-1 border rounded"
-                  disabled={loading}
-                >
-                  +
-                </button>
-                <button
-                  onClick={() => handleRemoveFromCart(item.productId)}
-                  className="ml-4 text-red-500 hover:text-red-700"
-                  disabled={loading}
-                >
-                  Xóa
-                </button>
+    <>
+      <Header />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Giỏ hàng của bạn ({totalItems} sản phẩm)</h1>
+        <div className="space-y-4">
+          {cart.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center border rounded-lg p-4 shadow-sm"
+            >
+              <img
+                src={item.productImageUrl?.startsWith('http') ? item.productImageUrl : `${API_BASE_URL}${item.productImageUrl || '/placeholder-product.png'}`}
+                alt={item.productName}
+                className="w-24 h-24 object-cover rounded"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/placeholder-product.png';
+                }}
+              />
+              <div className="ml-4 flex-grow">
+                <h2 className="text-lg font-semibold">{item.productName}</h2>
+                <p className="text-gray-600">{item.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
+                <h2 className="text-lg">Kích cỡ: {item.size || 'N/A'}</h2>
+                <h2 className="text-lg">Thương hiệu: {item.brand || 'N/A'}</h2>
+                <div className="flex items-center mt-2">
+                  <button
+                    onClick={() => handleUpdateQuantity(item.productId, item.quantity - 1)}
+                    className="px-2 py-1 border rounded"
+                    disabled={loading}
+                  >
+                    -
+                  </button>
+                  <span className="mx-2">{item.quantity}</span>
+                  <button
+                    onClick={() => handleUpdateQuantity(item.productId, item.quantity + 1)}
+                    className="px-2 py-1 border rounded"
+                    disabled={loading}
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={() => handleRemoveFromCart(item.productId)}
+                    className="ml-4 text-red-500 hover:text-red-700"
+                    disabled={loading}
+                  >
+                    Xóa
+                  </button>
+                </div>
               </div>
+              <p className="font-bold">{(item.price * item.quantity).toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
             </div>
-            <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mt-8 flex justify-between items-center">
-        <button
-          onClick={handleClearCart}
-          className="text-red-500 hover:text-red-700"
-          disabled={loading}
-        >
-          Xóa toàn bộ giỏ hàng
-        </button>
-        <div>
-          <p className="text-xl font-bold">Tổng cộng: ${totalPrice.toFixed(2)}</p>
+          ))}
+        </div>
+        <div className="mt-8 flex justify-between items-center">
           <button
-            onClick={handleCheckout}
-            className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md"
+            onClick={handleClearCart}
+            className="text-red-500 hover:text-red-700"
             disabled={loading}
           >
-            Tiến hành thanh toán
+            Xóa toàn bộ giỏ hàng
           </button>
+          <div>
+            <p className="text-xl font-bold">Tổng cộng: {totalPrice.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
+            <button
+              onClick={handleCheckout}
+              className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md"
+              disabled={loading}
+            >
+              Tiến hành thanh toán
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+      <FooterPage />
+    </>
   );
 }

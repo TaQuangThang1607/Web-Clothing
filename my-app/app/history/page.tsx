@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { getUserOrdersApi, OrderDetail } from '../services/client/OrderService';
+import Header from '../components/Header';
+import FooterPage from '../components/Footer';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderDetail[]>([]);
@@ -51,6 +53,8 @@ export default function OrdersPage() {
   }
 
   return (
+    <>
+    <Header />
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Lịch sử đơn hàng</h1>
       {orders.length === 0 ? (
@@ -75,26 +79,26 @@ export default function OrdersPage() {
                 <span
                   className={`text-sm font-medium px-3 py-1 rounded-full ${
                     order.status === 'Chờ xử lý'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : order.status === 'Đang xử lý'
-                      ? 'bg-blue-100 text-blue-800'
-                      : order.status === 'Hoàn thành'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : order.status === 'Đang xử lý'
+                    ? 'bg-blue-100 text-blue-800'
+                    : order.status === 'Hoàn thành'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
                   }`}
-                >
+                  >
                   {order.status}
                 </span>
               </div>
               <p className="text-gray-600">Ngày tạo: {new Date(order.createdAt).toLocaleString('vi-VN')}</p>
-              <p className="text-gray-600">Tổng giá: ${order.totalPrice.toFixed(2)}</p>
+              <p className="text-gray-600">Tổng giá:               {order.totalPrice.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
               <div className="mt-4">
                 <h3 className="text-md font-medium text-gray-700">Sản phẩm:</h3>
                 <ul className="list-disc ml-5 mt-2 space-y-2">
                   {order.items.map((item) => (
                     <li key={item.productId} className="text-gray-600">
-                      {item.productName} (Kích cỡ: {item.size || 'N/A'}, Màu: {item.color || 'N/A'}) x {item.quantity} - $
-                      {(item.price * item.quantity).toFixed(2)}
+                      {item.productName} (Kích cỡ: {item.size || 'N/A'}, Màu: {item.color || 'N/A'}) x {item.quantity} - 
+                      {(item.price * item.quantity).toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND                      
                     </li>
                   ))}
                 </ul>
@@ -111,5 +115,7 @@ export default function OrdersPage() {
         </div>
       )}
     </div>
+    <FooterPage />
+      </>
   );
 }

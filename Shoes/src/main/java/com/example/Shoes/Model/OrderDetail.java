@@ -12,7 +12,9 @@ public class OrderDetail {
     private Long id;
 
     private int quantity;
-    private double price; // Giá tại thời điểm mua
+    private double price;
+    private String size; 
+    private String color;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

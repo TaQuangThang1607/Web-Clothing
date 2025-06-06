@@ -15,7 +15,7 @@ export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
-  const [allProducts, setAllProducts] = useState<Product[]>([]); // Lưu danh sách đầy đủ
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,7 @@ export default function ProductsPage() {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sort, setSort] = useState('name,asc');
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 500 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 10000000 });
   const [brands, setBrands] = useState([
     { name: 'Nike', count: 0 },
     { name: 'Converse', count: 0 },
@@ -122,7 +122,7 @@ export default function ProductsPage() {
       <>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Shoes</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">Tìm kiếm sản phẩm</h1>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
               <div className="space-y-6 animate-pulse">
@@ -176,7 +176,7 @@ export default function ProductsPage() {
       
       <div className="bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Shoes</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">Tìm kiếm sản phẩm</h1>
           <div className="grid grid-cols-1 gap-6">
             <div className="col-span-1">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -184,7 +184,7 @@ export default function ProductsPage() {
                   <div className="flex w-full">
                     <input
                       type="search"
-                      className="flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="text-black flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Search products..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -202,17 +202,17 @@ export default function ProductsPage() {
                 <div className="lg:col-span-5"></div>
                 <div className="lg:col-span-3">
                   <div className="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
-                    <label htmlFor="sort" className="text-gray-700">Sort by:</label>
+                    <label htmlFor="sort" className="text-gray-700">Sắp xếp theo:</label>
                     <select
                       id="sort"
                       className="bg-gray-50 border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded text-black"
                       value={sort}
                       onChange={(e) => setSort(e.target.value)}
                     >
-                      <option value="name,asc">Name (A-Z)</option>
-                      <option value="name,desc">Name (Z-A)</option>
-                      <option value="price,asc">Price (Low to High)</option>
-                      <option value="price,desc">Price (High to Low)</option>
+                      <option value="name,asc">Tên (A-Z)</option>
+                      <option value="name,desc">Tên (Z-A)</option>
+                      <option value="price,asc">Giá (Thấp đến Cao)</option>
+                      <option value="price,desc">Giá (Cao đến Thấp)</option>
                     </select>
                   </div>
                 </div>
@@ -221,7 +221,7 @@ export default function ProductsPage() {
                 <div className="lg:col-span-3">
                   <div className="space-y-6">
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-900">Brands</h4>
+                      <h4 className="text-lg font-semibold text-gray-900">Thương hiệu</h4>
                       <ul className="space-y-2">
                         <li
                           className={`flex justify-between items-center cursor-pointer ${selectedBrand === null ? 'text-blue-500 font-medium' : 'text-gray-700 hover:text-blue-500'}`}
@@ -231,7 +231,7 @@ export default function ProductsPage() {
                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            All Brands
+                            Tổng sản phẩm
                           </span>
                           <span className="text-gray-500">({allProducts.length})</span>
                         </li>
@@ -253,18 +253,21 @@ export default function ProductsPage() {
                       </ul>
                     </div>
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Price Range</h4>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Giá tiền</h4>
                       <input
                         type="range"
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                         min="0"
-                        max="500"
+                        max="10000000"
                         value={priceRange.max}
                         onChange={handlePriceChange}
                       />
                       <div className="flex justify-between text-gray-700">
-                        <span>$0</span>
-                        <span>${priceRange.max}</span>
+                        <span>0 đ</span>
+                        <span>
+{priceRange.max!= null ? `${priceRange.max.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND` : 'N/A'} 
+
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -288,10 +291,10 @@ export default function ProductsPage() {
                             <h4 className="text-lg font-semibold text-gray-900">{product.name}</h4>
                             <p className="text-gray-600 text-sm line-clamp-2">{product.description || 'No description available'}</p>
                             <div className="flex justify-between items-center mt-4 flex-wrap">
-                              <p className="text-gray-900 font-bold text-lg">
-                                ${product.price?.toFixed(2) || 'N/A'} / {product.size || 'N/A'}
+                              <p className="text-gray-900 font-bold text-lg"> 
+                                   {product.price != null ? product.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) : 'N/A'}  đ
                               </p>
-
+                                  
                               <button
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -303,7 +306,7 @@ export default function ProductsPage() {
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                 </svg>
-                                {addedToCartIds.has(product.id) ? 'Added' : 'Add to cart'}
+                                {addedToCartIds.has(product.id) ? 'Đã thêm' : 'Thêm sản phẩm vào giỏ hàng'}
                               </button>
 
 

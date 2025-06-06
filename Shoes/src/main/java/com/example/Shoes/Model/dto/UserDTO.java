@@ -1,5 +1,7 @@
 package com.example.Shoes.Model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,12 +12,12 @@ import lombok.Data;
 public class UserDTO {
     private Long id;
 
-    @NotBlank(message = "Email is mandatory")
-    @Email(message = "Please provide a valid email address")
+    @Email(message = "Email không hợp lệ")
+    @NotBlank(message = "Email không được để trống")
     @Size(max = 100, message = "Email must be less than 100 characters")
     private String email;
 
-    @NotBlank(message = "Password is mandatory")
+    @NotBlank(message = "Mật khẩu không được để trống")
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
@@ -29,5 +31,6 @@ public class UserDTO {
     private String address;
 
     @NotNull(message = "Role ID is required")
+    @JsonProperty("role")
     private Long roleId;
 }

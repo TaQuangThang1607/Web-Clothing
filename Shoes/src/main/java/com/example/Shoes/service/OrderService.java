@@ -21,5 +21,4 @@ public interface OrderService {
     Optional<Order> getOrderById(Long orderId);
     List<OrderHistory> getOrderHistory(Long orderId);
 
-    Page<OrderDTO> getAllOrders(Pageable pageable);
 }

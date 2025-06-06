@@ -1,4 +1,3 @@
-// app/admin/update/[id]/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -15,7 +14,7 @@ export default function UpdateUserPage() {
     fullName: '',
     phone: '',
     address: '',
-    role: { id: 2, name: 'USER', description: '' }
+    role: 2 // Giá trị mặc định
   });
   
   const [loading, setLoading] = useState(true);
@@ -31,10 +30,10 @@ export default function UpdateUserPage() {
           fullName: user.fullName,
           phone: user.phone,
           address: user.address,
-          role: user.role
+          role: user.role || 2
         });
-      } catch (err) {
-        setError('Không thể tải thông tin người dùng.');
+      } catch (err: any) {
+        setError(err.message || 'Không thể tải thông tin người dùng.');
       } finally {
         setLoading(false);
       }
@@ -43,34 +42,28 @@ export default function UpdateUserPage() {
   }, [id]);
 
   const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-) => {
-  const { name, value } = e.target;
-
-  if (name === 'role') {
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      role: {
-        id: value === 'ADMIN' ? 1 : 2, // ADMIN=1, USER=2
-        name: value,
-        description: prev.role?.description || '' // đảm bảo là string
-      }
+      [name]: name === 'role' ? Number(value) : value
     }));
-  } else {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  }
-};
-
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
+    if (typeof formData.role !== 'number' || ![1, 2].includes(formData.role)) {
+      setError('Vai trò không hợp lệ.');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
+      console.log('Sending form data:', formData); // Debug
       await updateUser(Number(id), {
         email: formData.email,
         fullName: formData.fullName,
@@ -79,8 +72,8 @@ export default function UpdateUserPage() {
         role: formData.role
       });
       router.push('/admin/users');
-    } catch (err) {
-      setError('Đã xảy ra lỗi khi cập nhật người dùng.');
+    } catch (err: any) {
+      setError(err.message || 'Đã xảy ra lỗi khi cập nhật người dùng.');
     } finally {
       setIsSubmitting(false);
     }
@@ -147,12 +140,12 @@ export default function UpdateUserPage() {
           <label className="block text-sm font-medium text-gray-700 mb-1">Vai trò</label>
           <select
             name="role"
-            value={formData.role?.name || 'USER'}
+            value={formData.role ?? 2}
             onChange={handleChange}
             className="w-full p-2 border rounded border-gray-300"
           >
-            <option value="USER">Người dùng (USER)</option>
-            <option value="ADMIN">Quản trị viên (ADMIN)</option>
+            <option value={2}>Người dùng (USER)</option>
+            <option value={1}>Quản trị viên (ADMIN)</option>
           </select>
         </div>
 

@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Carousel from './components/Carousel';
 import Featurs from './components/Featurs';
 import ProductsByIdsView from './components/ProductsByIdsView';
+import Header from './components/Header';
+import FooterPage from './components/Footer';
 
 export const metadata: Metadata = {
   title: 'Trang chủ - Cửa hàng giày trực tuyến',
@@ -17,6 +19,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main className="bg-white">
+      <Header />
       <Carousel />
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Featurs />
@@ -24,6 +27,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <ProductsByIdsView />
       </section>
+      <FooterPage />
     </main>
   );
 }

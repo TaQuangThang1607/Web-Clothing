@@ -1,22 +1,23 @@
 'use client';
 
 import { createProduct } from "@/app/services/productService";
-import { ProductDTO } from "@/app/types/dto/apiResponse";
+import { Product } from "@/app/types/product";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 export default function CreateProductPage() {
     const router = useRouter();
-    const [formData, setFormData] = useState<ProductDTO>({
+    const [formData, setFormData] = useState<Product>({
         id: 0,
         name: '',
         description: '',
-        size: '',
+        size: 0,
         color: '',
         price: 0,
         brand: '',
         imageUrl: '',
+        quantity:0,
     });
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -91,11 +92,13 @@ export default function CreateProductPage() {
                 id: 0,
                 name: '',
                 description: '',
-                size: '',
+                size: 0,
                 color: '',
                 price: 0,
                 brand: '',
                 imageUrl: '',
+                sold:0,
+                quantity:0,
             });
             setImageFile(null);
             setImagePreview(null);
@@ -197,6 +200,21 @@ export default function CreateProductPage() {
                 />
 
                 </div>
+
+                <div>
+                    <label htmlFor="quantity" className="block">Số lượng</label>
+                    <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    value={isNaN(formData.quantity) ? '' : formData.quantity}
+                    onChange={handleChange}
+                    className="w-full border p-2"
+                    required
+                />
+
+                </div>
+
                 <div>
                     <label htmlFor="image" className="block">Hình ảnh</label>
                     <input

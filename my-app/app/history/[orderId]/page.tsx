@@ -8,6 +8,8 @@ import {
   OrderDetail,
   OrderHistory,
 } from '../../services/client/OrderService';
+import FooterPage from '@/app/components/Footer';
+import Header from '@/app/components/Header';
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -69,6 +71,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderId:
   }
 
   return (
+    <>
+    <Header />
     <div className="max-w-7xl mx-auto px-4 py-12 text-black">
       <h1 className="text-3xl font-bold mb-6">Chi tiết đơn hàng: {order.orderCode}</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -81,7 +85,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderId:
             Ngày tạo: {new Date(order.createdAt).toLocaleString('vi-VN')}
           </p>
           <p className="text-gray-600">Phương thức thanh toán: {order.paymentMethod}</p>
-          <p className="font-bold mt-2 text-gray-700">Tổng giá: ${order.totalPrice.toFixed(2)}</p>
+          <p className="font-bold mt-2 text-gray-700">Tổng giá: {order.totalPrice.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
+          
 
           <h3 className="text-md font-medium text-gray-700 mt-4">Sản phẩm:</h3>
           <div className="space-y-4 mt-2">
@@ -90,25 +95,26 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderId:
                 <img
                   src={
                     item.imageUrl?.startsWith('http')
-                      ? item.imageUrl
-                      : `${API_BASE_URL}${item.imageUrl || '/placeholder-product.png'}`
+                    ? item.imageUrl
+                    : `${API_BASE_URL}${item.imageUrl || '/placeholder-product.png'}`
                   }
                   alt={item.productName}
                   className="w-16 h-16 object-cover rounded"
                   onError={(e) =>
                     ((e.target as HTMLImageElement).src = '/placeholder-product.png')
                   }
-                />
+                  />
                 <div className="ml-4 flex-grow">
                   <p className="text-gray-600">{item.productName}</p>
                   <p className="text-gray-600">
                     Kích cỡ: {item.size || 'N/A'}, Màu: {item.color || 'N/A'}
                   </p>
                   <p className="text-gray-600">
-                    Số lượng: {item.quantity} x ${item.price.toFixed(2)}
+                    Số lượng: {item.quantity} x {item.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND
                   </p>
                 </div>
-                <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                <p className="font-bold">
+{(item.price * item.quantity).toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND                   </p>
               </div>
             ))}
           </div>
@@ -147,9 +153,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderId:
       <button
         onClick={() => router.push('/history')}
         className="mt-6 bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-md"
-      >
+        >
         Quay lại
       </button>
     </div>
+    <FooterPage />
+        </>
   );
 }

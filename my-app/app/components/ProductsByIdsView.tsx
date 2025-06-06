@@ -33,12 +33,12 @@ export default function FeaturedProductsView() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 text-black">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Featured Products</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Sản phẩm nổi bật</h2>
           <Link href="/products">
             <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md transition duration-300">
-              View All Products
+              Xem tất cả sản phẩm
             </button>
           </Link>
         </div>
@@ -78,15 +78,15 @@ export default function FeaturedProductsView() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Featured Products</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Sản phẩm nổi bật</h2>
         <Link href="/products">
           <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md transition duration-300">
-            View All Products
+            Xem tất cả sản phẩm
           </button>
         </Link>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="text-black grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {products.map((product) => (
           <div key={product.id} className="border rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
             <div className="p-4">
@@ -101,7 +101,8 @@ export default function FeaturedProductsView() {
               <h2 className="font-semibold text-lg">{product.name}</h2>
               <p className="text-gray-600 text-sm line-clamp-2">{product.description || 'No description available'}</p>
               <p className="text-green-600 font-bold mt-2">
-                ${product.price.toFixed(2)}
+                ${product.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 })}
+
               </p>
             </div>
           </div>

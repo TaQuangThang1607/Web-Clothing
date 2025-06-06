@@ -4,6 +4,8 @@ import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "../context/UserContext";
 import { loginApi } from "../services/apiService";
+import Header from "../components/Header";
+import FooterPage from "../components/Footer";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -23,11 +25,10 @@ export default function LoginPage() {
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
 
-      // Chuyển hướng dựa trên role
-      if (user.role === 'ADMIN') {
+      if (user.role === "USER") {
         router.push('/');
       } else {
-        router.push('/');
+        router.push('/admin');
       }
     } catch (err) {
         if (err instanceof Error) {
@@ -40,6 +41,8 @@ export default function LoginPage() {
   };
 
   return (
+    <>
+    <Header />
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-lg shadow-md">
         <form className="space-y-6" onSubmit={handleSubmit}>
@@ -89,5 +92,8 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+    <FooterPage />
+        </>
+
   );
 }

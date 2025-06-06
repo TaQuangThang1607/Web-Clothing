@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { getCartApi, clearCartApi, CartDetail } from '../services/client/CartService';
 import { createOrderApi, OrderInput } from '../services/client/OrderService';
+import FooterPage from '../components/Footer';
+import Header from '../components/Header';
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -108,16 +110,15 @@ export default function OrderPage() {
     }
     try {
       const order = await createOrderApi(formData);
-      await clearCartApi(); // Xóa giỏ hàng sau khi tạo đơn hàng
-      setCart([]); // Cập nhật state giỏ hàng
+      await clearCartApi();
+      setCart([]);
       toast.success(`Đơn hàng ${order.orderCode} đã được tạo thành công!`);
-      router.push('/orders'); // Chuyển hướng đến trang danh sách đơn hàng
+      router.push('/history');
     } catch (err: any) {
       toast.error(err.message || 'Lỗi khi tạo đơn hàng');
     }
   };
 
-  // Tính tổng số lượng và tổng giá
   const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
   const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
@@ -148,6 +149,8 @@ export default function OrderPage() {
   }
 
   return (
+    <>
+    <Header />
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Thanh toán</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -157,8 +160,8 @@ export default function OrderPage() {
           <div className="space-y-4">
             {cart.map((item) => (
               <div
-                key={item.id}
-                className="flex items-center border rounded-lg p-4 shadow-sm"
+              key={item.id}
+              className="flex items-center border rounded-lg p-4 shadow-sm"
               >
                 <img
                   src={item.productImageUrl?.startsWith('http') ? item.productImageUrl : `${API_BASE_URL}${item.productImageUrl || '/placeholder-product.png'}`}
@@ -167,19 +170,19 @@ export default function OrderPage() {
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = '/placeholder-product.png';
                   }}
-                />
+                  />
                 <div className="ml-4 flex-grow">
                   <h2 className="text-lg font-semibold">{item.productName}</h2>
-                  <p className="text-gray-600">${item.price.toFixed(2)}</p>
+                  <p className="text-gray-600">{item.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
                   <p className="text-lg">Kích cỡ: {item.size || 'N/A'}</p>
                   <p className="text-lg">Thương hiệu: {item.brand || 'N/A'}</p>
                   <p className="text-lg">Số lượng: {item.quantity}</p>
                 </div>
-                <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                <p className="font-bold">{(item.price * item.quantity).toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
               </div>
             ))}
           </div>
-          <p className="mt-4 text-xl font-bold">Tổng cộng: ${totalPrice.toFixed(2)}</p>
+          <p className="mt-4 text-xl font-bold">Tổng cộng:  {totalPrice.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
         </div>
 
         {/* Phần form nhập thông tin giao hàng */}
@@ -198,7 +201,7 @@ export default function OrderPage() {
                 onChange={handleInputChange}
                 className={`mt-1 block w-full border rounded-md p-2 ${formErrors.receiverName ? 'border-red-500' : ''}`}
                 
-              />
+                />
               {formErrors.receiverName && (
                 <p className="text-red-500 text-sm mt-1">{formErrors.receiverName}</p>
               )}
@@ -215,7 +218,7 @@ export default function OrderPage() {
                 onChange={handleInputChange}
                 className={`mt-1 block w-full border rounded-md p-2 ${formErrors.receiverAddress ? 'border-red-500' : ''}`}
                 
-              />
+                />
               {formErrors.receiverAddress && (
                 <p className="text-red-500 text-sm mt-1">{formErrors.receiverAddress}</p>
               )}
@@ -233,7 +236,7 @@ export default function OrderPage() {
                 className={`mt-1 block w-full border rounded-md p-2 ${formErrors.receiverPhone ? 'border-red-500' : ''}`}
                 
                 pattern="^\+?[1-9]\d{1,14}$"
-              />
+                />
               {formErrors.receiverPhone && (
                 <p className="text-red-500 text-sm mt-1">{formErrors.receiverPhone}</p>
               )}
@@ -248,7 +251,7 @@ export default function OrderPage() {
                 value={formData.receiverNote}
                 onChange={handleInputChange}
                 className="mt-1 block w-full border rounded-md p-2"
-              />
+                />
             </div>
             <div>
               <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">
@@ -260,7 +263,7 @@ export default function OrderPage() {
                 value={formData.paymentMethod}
                 onChange={handleInputChange}
                 className="mt-1 block w-full border rounded-md p-2"
-              >
+                >
                 <option value="CASH">Tiền mặt</option>
                 <option value="CARD">Thẻ tín dụng</option>
                 <option value="TRANSFER">Chuyển khoản</option>
@@ -270,12 +273,14 @@ export default function OrderPage() {
               type="submit"
               className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md"
               disabled={loading}
-            >
+              >
               Hoàn tất
             </button>
           </form>
         </div>
       </div>
     </div>
+    <FooterPage />
+              </>
   );
 }

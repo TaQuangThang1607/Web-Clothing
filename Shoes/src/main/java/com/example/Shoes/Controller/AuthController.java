@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -45,32 +46,31 @@ public class AuthController {
     
    @PostMapping("/auth/login")
 public ResponseEntity<RestLoginDTO> login(@RequestBody UserDTO dto) throws IdInvalidException {
-    UsernamePasswordAuthenticationToken authenticationToken = 
-            new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
+    // Kiểm tra sự tồn tại của tài khoản trước
+    Optional<User> currentUserDB = userService.handleGetUserByEmail(dto.getEmail());
+    if (!currentUserDB.isPresent()) {
+        throw new IdInvalidException("Tài khoản không tồn tại");
+    }
+
+    try {
+        // Tiến hành xác thực
+        UsernamePasswordAuthenticationToken authenticationToken = 
+                new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         
         RestLoginDTO restLoginDTO = new RestLoginDTO();
-        Optional<User> currentUserDB = userService.handleGetUserByEmail(dto.getEmail());
-
-        if (currentUserDB.isPresent()) {
-            User user = currentUserDB.get();
-            RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(
-                user.getId(), 
-                user.getEmail(), 
-                user.getFullName(),
-                user.getRole().getName()
-            );
-            restLoginDTO.setUser(userLogin);
-        } else {
-            throw new IdInvalidException("Không tìm thấy người dùng với email: " + dto.getEmail());
-        }
+        User user = currentUserDB.get();
+        RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(
+            user.getId(), 
+            user.getEmail(), 
+            user.getFullName(),
+            user.getRole().getName()
+        );
+        restLoginDTO.setUser(userLogin);
 
         String accessToken = securityUtil.createAccessToken(authentication.getName(), restLoginDTO.getUser());
-        
-        
-        
         String refreshToken = securityUtil.createRefreshToken(dto.getEmail(), restLoginDTO);
 
         restLoginDTO.setAccessToken(accessToken);
@@ -93,8 +93,13 @@ public ResponseEntity<RestLoginDTO> login(@RequestBody UserDTO dto) throws IdInv
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
             .body(restLoginDTO);
+
+    } catch (BadCredentialsException e) {
+        throw new IdInvalidException("Mật khẩu không chính xác");
+    } catch (Exception e) {
+        throw new IdInvalidException("Đã xảy ra lỗi trong quá trình đăng nhập: " + e.getMessage());
+    }
 }
-    
    @GetMapping("/auth/account")
     public ResponseEntity<RestLoginDTO.UserGetAccount> getAccount() {
         Optional<String> emailOpt = SecurityUtil.getCurrentUserLogin();

@@ -134,24 +134,31 @@ export async function refreshTokenApi(): Promise<LoginData> {
 export async function loginApi(email: string, password: string): Promise<LoginData> {
   const res = await fetch(`${API_URL}/login`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
-    credentials: 'include',
+    credentials: 'include', // Đảm bảo gửi cookie nếu cần
   });
 
-  const response: ApiResponse<LoginData> = await res.json();
-
   if (!res.ok) {
-    throw new Error(response.message || 'Đăng nhập thất bại');
+    const contentType = res.headers.get('Content-Type');
+    if (contentType && contentType.includes('application/json')) {
+      const errorResponse = await res.json();
+      // Ném lỗi với thông báo từ trường "error"
+      throw new Error(errorResponse.error || 'Đăng nhập thất bại');
+    } else {
+      const errorText = await res.text();
+      throw new Error(errorText || 'Đăng nhập thất bại');
+    }
   }
 
-  if (!response.data || !response.data.access_token || !response.data.user) {
-    throw new Error('Phản hồi đăng nhập không hợp lệ');
-  }
-
-  return response.data;
+  const response = await res.json();
+  const user = {
+    id: response.data.user.id,
+    email: response.data.user.email,
+    fullName: response.data.user.fullName,
+    role: response.data.user.role
+  };
+  return { access_token: response.data.access_token, user };
 }
 
 export async function getAccountApi(): Promise<User> {
@@ -159,4 +166,28 @@ export async function getAccountApi(): Promise<User> {
     method: 'GET',
     credentials: 'include',
   }).then((data) => data.user);
+}
+
+
+export async function registerApi(userData: {
+  email: string;
+  fullName: string;
+  password: string;
+  phone?: string;
+  address?: string;
+  role?: number;
+}): Promise<User> {
+  const res = await fetch(`http://localhost:8080/api/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || 'Đăng ký thất bại');
+  }
+
+  const response = await res.json();
+  return response.data; // Trả về user từ ApiResponse
 }

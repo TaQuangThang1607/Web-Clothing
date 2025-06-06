@@ -5,15 +5,15 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { getProductById } from '@/app/services/productService';
 import { Product } from '@/app/types/product';
-
+import { addToCartApi } from '@/app/services/client/CartService';
+import { toast } from 'react-toastify';
 
 export default function ProductDetailClientPage() {
   const params = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [addedToCart, setAddedToCart] = useState(false);
-  
+  const [addedToCartIds, setAddedToCartIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const productId = parseInt(params.id as string);
@@ -23,10 +23,14 @@ export default function ProductDetailClientPage() {
     });
   }, [params.id]);
 
-  const handleAddToCart = () => {
-    console.log(`Added ${quantity} of ${product?.name} to cart`);
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
+  const handleAddToCart = async (product: Product) => {
+    try {
+      await addToCartApi(product.id, quantity);
+      setAddedToCartIds((prev) => new Set(prev).add(product.id));
+      toast.success(`${product.name} đã được thêm vào giỏ hàng`);
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi thêm sản phẩm vào giỏ hàng');
+    }
   };
 
   const increaseQuantity = () => setQuantity((q) => q + 1);
@@ -41,82 +45,94 @@ export default function ProductDetailClientPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 px-4 text-gray-800">
+    <div className="max-w-6xl mx-auto px-4 py-12 text-black">
+      {/* Sản phẩm */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        <div className="bg-white p-4 rounded-2xl shadow-lg">
-          <div className="relative h-96 w-full">
+        {/* Hình ảnh */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+          <div className="relative h-[500px] w-full rounded-2xl overflow-hidden">
             <Image
               src={`http://localhost:8080${product.imageUrl}`}
               alt={product.name}
               fill
-              className="object-contain rounded-2xl"
+              className="object-contain"
               priority
             />
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-lg flex flex-col justify-between">
+        {/* Thông tin sản phẩm */}
+        <div className="flex flex-col justify-between bg-white p-6 rounded-2xl shadow-md">
           <div>
-            <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
-            <p className="text-xl text-red-600 font-semibold mb-4">
-              {Number(product.price).toFixed(2)} $ / {product.size}
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">{product.name}</h1>
+            <p className="text-2xl text-red-600 font-semibold mb-4">
+              {product.price != null ? product.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) : 'N/A'}  đ
             </p>
-            <p className="mb-6 text-gray-700">{product.description}</p>
+            <p> Size giày: {product.size}</p>
+            <p> Thương hiệu: {product.brand}</p><br />
+            <p className="text-gray-700 leading-relaxed">{product.description}</p>
           </div>
 
-          <div className="flex items-center mb-6">
-            <div className="flex items-center border rounded-lg">
+          {/* Số lượng và nút thêm giỏ */}
+          <div className="mt-6 flex items-center gap-4 flex-wrap">
+            {/* Bộ đếm */}
+            <div className="flex items-center border rounded-lg overflow-hidden">
               <button
-                className="px-4 py-2 text-lg font-medium hover:bg-gray-100 rounded-l-lg"
+                className="px-4 py-2 text-xl font-bold hover:bg-gray-100"
                 onClick={decreaseQuantity}
               >
                 -
               </button>
-              <span className="px-6 py-2 border-x">{quantity}</span>
+              <span className="px-6 py-2 border-x text-lg">{quantity}</span>
               <button
-                className="px-4 py-2 text-lg font-medium hover:bg-gray-100 rounded-r-lg"
+                className="px-4 py-2 text-xl font-bold hover:bg-gray-100"
                 onClick={increaseQuantity}
               >
                 +
               </button>
             </div>
 
+            {/* Nút thêm giỏ */}
             <button
-              onClick={handleAddToCart}
-              className={`ml-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center ${
-                addedToCart ? 'bg-green-600 hover:bg-green-700' : ''
+              onClick={(e) => {
+                e.preventDefault();
+                handleAddToCart(product);
+              }}
+              disabled={addedToCartIds.has(product.id)}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium shadow-md transition duration-200 ${
+                addedToCartIds.has(product.id)
+                  ? 'bg-green-100 text-green-600 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
               }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
+                className="h-5 w-5"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
                 <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
               </svg>
-              {addedToCart ? 'Đã thêm!' : 'Thêm vào giỏ'}
+              {addedToCartIds.has(product.id) ? 'Đã thêm!' : 'Thêm vào giỏ'}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Bình luận tĩnh */}
-      <div className="mt-12 bg-white p-6 rounded-2xl shadow-lg">
-        <h2 className="text-2xl font-semibold mb-4">Bình luận</h2>
-        <div className="space-y-4">
-          <div className="border-b pb-4">
-            <p className="font-semibold">Nguyễn Văn A</p>
-            <p className="text-gray-600">Sản phẩm rất chất lượng, giao hàng nhanh!</p>
-          </div>
-          <div className="border-b pb-4">
-            <p className="font-semibold">Trần Thị B</p>
-            <p className="text-gray-600">Mình rất hài lòng, sẽ mua lần sau ❤️</p>
-          </div>
-          <div>
-            <p className="font-semibold">Lê Văn C</p>
-            <p className="text-gray-600">Đóng gói cẩn thận, sản phẩm đúng mô tả.</p>
-          </div>
+      {/* Bình luận */}
+      <div className="mt-14 bg-white p-6 md:p-8 rounded-2xl shadow-md">
+        <h2 className="text-2xl font-semibold mb-6">Bình luận</h2>
+        <div className="space-y-6">
+          {[
+            { name: 'Nguyễn Văn A', comment: 'Sản phẩm rất chất lượng, giao hàng nhanh!' },
+            { name: 'Trần Thị B', comment: 'Mình rất hài lòng, sẽ mua lần sau ❤️' },
+            { name: 'Lê Văn C', comment: 'Đóng gói cẩn thận, sản phẩm đúng mô tả.' },
+          ].map((c, i) => (
+            <div key={i} className="border-b pb-4">
+              <p className="font-semibold text-gray-800">{c.name}</p>
+              <p className="text-gray-600">{c.comment}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

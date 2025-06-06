@@ -1,20 +1,22 @@
+
 'use client';
 
 import { getProductById, updateProduct } from '@/app/services/productService';
-import { ProductDTO } from '@/app/types/dto/apiResponse';
 import { useRouter, useParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { fetchWithTokenRefresh } from '@/app/services/apiService';
+import { Product } from '@/app/types/product';
 
 export default function UpdateProduct() {
   const router = useRouter();
   const { id } = useParams();
 
-  const [formData, setFormData] = useState<ProductDTO>({
+  const [formData, setFormData] = useState<Product>({
     id: 0,
     name: '',
     description: '',
-    size: '',
+    size: 0,
+    quantity:0,
     color: '',
     price: 0,
     imageUrl: '',
@@ -26,6 +28,7 @@ export default function UpdateProduct() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  const [formattedPrice, setFormattedPrice] = useState<string>(''); // State cho giá trị định dạng
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -43,12 +46,19 @@ export default function UpdateProduct() {
           id: product.id || 0,
           name: product.name || '',
           description: product.description || '',
-          size: product.size || '',
+          size: product.size || 0,
+          quantity:product.quantity ||0,
           color: product.color || '',
           price: product.price ?? 0,
           brand: product.brand || '',
           imageUrl: product.imageUrl || '',
         });
+        // Định dạng price khi tải dữ liệu
+        setFormattedPrice(
+          product.price != null
+            ? product.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 })
+            : ''
+        );
         setImagePreview(product.imageUrl ? `http://localhost:8080${product.imageUrl}` : null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Lỗi khi lấy thông tin sản phẩm');
@@ -62,10 +72,23 @@ export default function UpdateProduct() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'price' ? (value === '' ? '' : parseFloat(value) || 0) : value,
-    }));
+    if (name === 'price') {
+      // Xử lý giá trị nhập vào
+      const cleanedValue = value.replace(/[^0-9]/g, ''); // Loại bỏ mọi ký tự không phải số
+      const numericValue = cleanedValue ? parseInt(cleanedValue, 10) : 0;
+      setFormData((prev) => ({
+        ...prev,
+        price: numericValue,
+      }));
+      setFormattedPrice(
+        numericValue.toLocaleString('vi-VN', { minimumFractionDigits: 0 })
+      );
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,47 +110,48 @@ export default function UpdateProduct() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!confirm('Bạn có chắc muốn cập nhật sản phẩm này?')) return;
-  setIsLoading(true);
-  setError(null);
-  setSuccess(null);
+    e.preventDefault();
+    if (!confirm('Bạn có chắc muốn cập nhật sản phẩm này?')) return;
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
 
-  try {
-    const productId = Array.isArray(id) ? id[0] : id;
-    if (!productId || isNaN(parseInt(productId))) {
-      throw new Error('ID sản phẩm không hợp lệ');
+    try {
+      const productId = Array.isArray(id) ? id[0] : id;
+      if (!productId || isNaN(parseInt(productId))) {
+        throw new Error('ID sản phẩm không hợp lệ');
+      }
+
+      // Validate form data
+      if (!formData.name || !formData.size || !formData.color || !formData.brand) {
+        throw new Error('Vui lòng điền đầy đủ các trường bắt buộc');
+      }
+
+      if (formData.price <= 0 || isNaN(formData.price)) {
+        throw new Error('Vui lòng nhập giá sản phẩm hợp lệ');
+      }
+
+      // Gọi service updateProduct
+      const updated = await updateProduct(parseInt(productId), {
+        id: formData.id,
+        name: formData.name,
+        description: formData.description,
+        size: formData.size,
+        quantity:formData.quantity,
+        color: formData.color,
+        price: formData.price,
+        brand: formData.brand,
+        imageUrl: formData.imageUrl,
+      }, imageFile || undefined);
+
+      setSuccess('Cập nhật sản phẩm thành công!');
+      setTimeout(() => router.push('/admin/products'), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Lỗi khi cập nhật sản phẩm');
+    } finally {
+      setIsLoading(false);
     }
-
-    // Validate form data
-    if (!formData.name || !formData.size || !formData.color || !formData.brand) {
-      throw new Error('Vui lòng điền đầy đủ các trường bắt buộc');
-    }
-
-    if (formData.price <= 0 || isNaN(formData.price)) {
-      throw new Error('Vui lòng nhập giá sản phẩm hợp lệ');
-    }
-
-    // Gọi service updateProduct
-    const updated = await updateProduct(parseInt(productId), {
-      id: formData.id,
-      name: formData.name,
-      description: formData.description,
-      size: formData.size,
-      color: formData.color,
-      price: formData.price,
-      brand: formData.brand,
-      imageUrl: formData.imageUrl,
-    }, imageFile || undefined);
-
-    setSuccess('Cập nhật sản phẩm thành công!');
-    setTimeout(() => router.push('/admin/products'), 2000);
-  } catch (err) {
-    setError(err instanceof Error ? err.message : 'Lỗi khi cập nhật sản phẩm');
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <div className="container mx-auto p-6 max-w-2xl text-black">
@@ -213,14 +237,13 @@ export default function UpdateProduct() {
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700">Giá <span className="text-red-500">*</span></label>
             <input
-              type="number"
+              type="text"
               id="price"
               name="price"
-              value={formData.price}
+              value={formattedPrice}
               onChange={handleChange}
               className="mt-1 w-full border rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-              min="0"
-              step="0.01"
+              placeholder="0"
               required
             />
           </div>
@@ -238,7 +261,8 @@ export default function UpdateProduct() {
           {imagePreview && (
             <div>
               <p className="block text-sm font-medium text-gray-700">Preview hình ảnh:</p>
-              <img src={`http://localhost:8080${formData.imageUrl}`} alt="Preview" className="mt-2 max-w-xs rounded-md shadow-sm" />            </div>
+              <img src={imagePreview} alt="Preview" className="mt-2 max-w-xs rounded-md shadow-sm" />
+            </div>
           )}
           <button
             type="submit"
@@ -249,7 +273,11 @@ export default function UpdateProduct() {
               <>
                 <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 -3.373 0 12h4zm2 5.291 7.962 7.962 0 014 -12H0c0 -3.042 1.135 -5.824 3 -7.938l3-2.647z"
+                  />
                 </svg>
                 Đang cập nhật...
               </>

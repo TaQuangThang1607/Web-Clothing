@@ -106,8 +106,6 @@ public class UserController {
                     .body(getValidationErrors(bindingResult));
         }
 
-
-        
         UserDTO updatedUser = userService.updateUser(id, dto);
         return ResponseEntity.ok(updatedUser);
     }

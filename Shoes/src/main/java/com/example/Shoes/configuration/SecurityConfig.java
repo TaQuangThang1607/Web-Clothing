@@ -45,12 +45,12 @@ public class SecurityConfig {
             .csrf(c -> c.disable())
             .authorizeHttpRequests(
                 auth -> auth
-                .requestMatchers("/","/uploads/**","/api/v1/auth/refresh","/api/v1/auth/login", "/api/products","/api/products/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/","/uploads/**","/api/v1/auth/refresh","/api/v1/auth/login", "/api/products","/api/products/**","/api/register").permitAll()
                 .anyRequest().authenticated()
             )
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
-            .authenticationEntryPoint(customAuthenticationEntryPoint)
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
             )
 
 

@@ -1,9 +1,6 @@
 {
-  "app": {
-    "[project]/app/login/page": [],
-    "[project]/app/unauthorized/page": []
-  },
-  "appUsingSizeAdjust": true,
+  "app": {},
+  "appUsingSizeAdjust": false,
   "pages": {},
   "pagesUsingSizeAdjust": false
 }

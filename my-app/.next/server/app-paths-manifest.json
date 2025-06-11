@@ -1,18 +1,9 @@
 {
+  "/[locale]/admin/page": "app/[locale]/admin/page.js",
+  "/[locale]/admin/users/page": "app/[locale]/admin/users/page.js",
+  "/[locale]/login/page": "app/[locale]/login/page.js",
+  "/[locale]/page": "app/[locale]/page.js",
+  "/[locale]/unauthorized/page": "app/[locale]/unauthorized/page.js",
   "/_not-found/page": "app/_not-found/page.js",
-  "/admin/orders/page": "app/admin/orders/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/admin/products/page": "app/admin/products/page.js",
-  "/admin/products/update/[id]/page": "app/admin/products/update/[id]/page.js",
-  "/admin/users/page": "app/admin/users/page.js",
-  "/cart/page": "app/cart/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/history/[orderId]/page": "app/history/[orderId]/page.js",
-  "/history/page": "app/history/page.js",
-  "/login/page": "app/login/page.js",
-  "/order/page": "app/order/page.js",
-  "/page": "app/page.js",
-  "/products/[id]/page": "app/products/[id]/page.js",
-  "/products/page": "app/products/page.js",
-  "/unauthorized/page": "app/unauthorized/page.js"
+  "/favicon.ico/route": "app/favicon.ico/route.js"
 }

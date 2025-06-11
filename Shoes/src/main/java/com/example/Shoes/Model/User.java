@@ -49,7 +49,7 @@ public class User implements Serializable{
     @Size(max = 200, message = "Address must be less than 200 characters")
     private String address;
 
-    @NotNull(message = "Role is required")
+    
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;

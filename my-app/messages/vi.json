@@ -1,0 +1,15 @@
+{
+  "HomePage": {
+    "title": "xin chào thế giới",
+    "about": "đi vào trang page"
+  },
+  "Header": {
+    "home": "Trang chủ",
+    "products": "Sản phẩm",
+    "login": "Đăng nhập",
+    "cart": "Giỏ hàng",
+    "logout": "Đăng xuất",
+    "admin": "Trang quản trị",
+    "history": "Lịch sử"
+  }
+}

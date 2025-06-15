@@ -45,7 +45,20 @@ public class SecurityConfig {
             .csrf(c -> c.disable())
             .authorizeHttpRequests(
                 auth -> auth
-                .requestMatchers("/","/uploads/**","/api/v1/auth/refresh","/api/v1/auth/login", "/api/products","/api/products/**","/api/register","/products/**").permitAll()
+                .requestMatchers("/",
+                "/uploads/**",
+                "/api/v1/auth/refresh",
+                "/api/v1/auth/login", 
+                "/api/products",
+                "/api/products/**",
+                "/api/register",
+                "api/products/**",
+                "/api/v1/auth/forgot-password",
+                "/api/v1/auth/reset-password",
+                "/api/cart/",
+                "/api/admin/**"
+
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

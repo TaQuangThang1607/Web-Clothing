@@ -13,21 +13,26 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Shoes.Model.User;
 import com.example.Shoes.Model.dto.RestLoginDTO;
 import com.example.Shoes.Model.dto.UserDTO;
+import com.example.Shoes.Repository.UserRepository;
 import com.example.Shoes.Service.UserService;
+import com.example.Shoes.Service.email.EmailService;
 import com.example.Shoes.utils.SecurityUtil;
 import com.example.Shoes.utils.error.IdInvalidException;
 
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -38,6 +43,9 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final UserService userService;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${thangjwt.jwt.refresh.token-validity-in-seconds}")
     private long refreshTokenExpiration;
@@ -200,5 +208,30 @@ public ResponseEntity<RestLoginDTO> login(@RequestBody UserDTO dto) throws IdInv
         
     }
 
-    
+
+    @PostMapping("/auth/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@RequestParam String email) throws MessagingException, IdInvalidException {
+        userService.generateResetPasswordToken(email);
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            throw new IdInvalidException("Email không tồn tại");
+        }
+        String resetToken = userOpt.get().getResetPasswordToken();
+        emailService.sendResetPasswordEmail(email, resetToken);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/auth/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @RequestParam String token,
+            @RequestParam String newPassword) throws IdInvalidException {
+        User user = userService.verifyResetPasswordToken(token);
+        
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null); 
+        user.setResetPasswordTokenExpiry(null);
+        userRepository.save(user);
+        
+        return ResponseEntity.ok().build();
+    }
 }

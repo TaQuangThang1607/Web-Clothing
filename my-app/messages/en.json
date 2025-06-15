@@ -1,6 +1,119 @@
 {
+  "common": {
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "emailLabel": "Email Address",
+      "submitButton": "Send Reset Link",
+      "successMessage": "If an account exists, a password reset link has been sent to your email.",
+      "errorMessage": "Failed to send reset link. Please try again.",
+      "backToLogin": "Back to Login"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "newPasswordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "submitButton": "Reset Password",
+      "successMessage": "Password has been reset successfully. Redirecting to login...",
+      "errorMessage": "Failed to reset password. Please try again.",
+      "invalidToken": "Invalid or missing reset token.",
+      "backToForgot": "Back to Forgot Password",
+      "passwordMismatch": "Passwords do not match."
+    }
+  },
   "HomePage": {
     "title": "Hello world!",
     "about": "Go to the about page"
+  },
+
+  "Features": {
+    "freeShippingTitle": "Free Shipping",
+    "freeShippingDesc": "Enjoy free shipping on all orders over $50.",
+    "securePaymentTitle": "Secure Payment",
+    "securePaymentDesc": "100% secure payment methods.",
+    "returnPolicyTitle": "30-Day Return",
+    "returnPolicyDesc": "Money-back guarantee within 30 days.",
+    "supportTitle": "24/7 Support",
+    "supportDesc": "Fast and reliable customer support anytime."
+  },
+  "Navigation": {
+  "home": "Home",
+  "products": "Products",
+  "admin": "Admin",
+  "orderHistory": "Order History",
+  "cart": "Cart",
+  "login": "Login",
+  "logout": "Logout",
+  "profile": "Profile",
+  "language": "Language"
+},
+"User": {
+  "greeting": "Hello, {name}",
+  "adminPanel": "Admin Panel",
+  "logout": "Logout",
+  "orderHistory": "Order History"
+},
+"Cart": {
+  "title": "Your Cart",
+  "empty": "Your cart is currently empty.",
+  "items": "items",
+  "loading": "Loading...",
+  "error": "Error",
+  "retry": "Retry",
+  "continueShopping": "Continue Shopping",
+  "remove": "Remove",
+  "clearCart": "Clear Cart",
+  "total": "Total",
+  "checkout": "Proceed to Checkout"
+},
+"Product": {
+  "featured": "Featured Products",
+  "latest": "Latest Products",
+  "price": "Price",
+  "addToCart": "Add to Cart",
+  "view": "View",
+  "shopNow": "Shop Now",
+  "viewAll": "View All",
+  "added": "Added",
+  "noDescription": "No description",
+  "details": "Product Details",
+  "description": "Description",
+  "reviews": "Reviews",
+  "loading": "Loading...",
+  "notFound": "Product not found",
+  "size": "Size",
+  "brand": "Brand",
+  "reviewer1": {
+    "name": "Nguyen Van A",
+    "comment": "Very high-quality product, fast delivery!"
+  },
+  "reviewer2": {
+    "name": "Tran Thi B",
+    "comment": "I'm very satisfied, will buy again ❤️"
+  },
+  "reviewer3": {
+    "name": "Le Van C",
+    "comment": "Carefully packaged, product matches the description."
   }
+}
+,
+"Footer": {
+    "home": "Home",
+    "products": "Products",
+    "contact": "Contact",
+    "copyright": "© {year} Online Shoe Store. All rights reserved."
+  },
+  "ProductPage": {
+    "searchTitle": "Search Products",
+    "searchPlaceholder": "Search for products...",
+    "sortBy": "Sort by:",
+    "sortNameAsc": "Name (A-Z)",
+    "sortNameDesc": "Name (Z-A)",
+    "sortPriceAsc": "Price (Low to High)",
+    "sortPriceDesc": "Price (High to Low)",
+    "brand": "Brand",
+    "allProducts": "Total Products",
+    "price": "Price",
+    "noProductsFound": "No matching products found."
+  }
+
 }

@@ -1,18 +1,21 @@
 'use client';
+
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import Link from 'next/link';
 import { useCart } from '../context/CartContextType';
-import { useLocale } from 'next-intl'; // Thêm useLocale từ next-intl
+import { useLocale } from 'next-intl';
+import { useTranslations } from "next-intl";
 
 export default function Header() {
+  const t = useTranslations("Navigation");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user, setUser } = useUser();
   const { totalItems } = useCart();
   const router = useRouter();
-  const locale = useLocale(); // Lấy locale hiện tại
+  const locale = useLocale();
 
   useEffect(() => {
     if (!user && typeof window !== 'undefined') {
@@ -33,9 +36,6 @@ export default function Header() {
     }
   }, [user]);
 
-  
-
-
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
@@ -46,7 +46,7 @@ export default function Header() {
   const isAdmin = user?.roleId === 1;
 
   return (
-    <header className="bg-white shadow">
+    <header className="bg-white shadow sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center p-4">
         {/* Logo */}
         <Link href={`/${locale}`} className="text-xl font-bold text-blue-600">
@@ -72,22 +72,38 @@ export default function Header() {
           className={`flex-col lg:flex-row lg:flex ${isMenuOpen ? 'flex' : 'hidden'} lg:items-center gap-6 absolute lg:static top-16 left-0 w-full lg:w-auto bg-white lg:bg-transparent p-4 lg:p-0 z-20`}
         >
           <Link href={`/${locale}`} className="hover:text-blue-600 text-gray-900">
-            Trang chủ
+            {t("home")}
           </Link>
           <Link href={`/${locale}/products`} className="hover:text-blue-600 text-gray-900">
-            Sản phẩm
+            {t("products")}
           </Link>
         </nav>
 
         {/* User section */}
         <div className="flex items-center gap-4 relative">
+          {/* Language Switcher (✅ sửa lỗi dùng emoji thay icon) */}
+          <div className="relative">
+            <select
+              value={locale}
+              onChange={(e) => {
+                const newLocale = e.target.value;
+                const path = window.location.pathname.replace(/^\/(vi|en)/, '');
+                window.location.href = `/${newLocale}${path}`;
+              }}
+              className="border rounded px-2 py-1 text-gray-700"
+            >
+              <option value="vi">🇻🇳 Vietnamese</option>
+              <option value="en">🇺🇸 English</option>
+            </select>
+          </div>
+
           {user ? (
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="text-gray-700 hover:text-blue-600 flex items-center gap-1"
               >
-                Xin chào, {user.fullName}
+                {user.fullName}
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -123,6 +139,7 @@ export default function Header() {
             </Link>
           )}
 
+          {/* Cart icon */}
           <Link href={`/${locale}/cart`} className="relative flex items-center text-gray-700 hover:text-blue-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path

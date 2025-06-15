@@ -1,4 +1,3 @@
-
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -7,6 +6,7 @@ import { toast } from 'react-toastify';
 import { getCartApi, addToCartApi, removeFromCartApi, updateCartQuantityApi, clearCartApi, CartDetail } from '../services/client/CartService';
 import Header from '../components/Header';
 import FooterPage from '../components/Footer';
+import { useTranslations, useLocale } from 'next-intl';
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -15,6 +15,17 @@ export default function CartPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const t = useTranslations('Cart');
+  const tProduct = useTranslations('Product');
+  const locale = useLocale();
+
+  // Hàm định dạng giá theo locale
+  const formatPrice = (price: number) => {
+    if (locale === 'vi') {
+      return price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) + ' VND';
+    }
+    return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 0 });
+  };
 
   // Tải giỏ hàng khi component mount
   const fetchCart = async () => {
@@ -87,7 +98,7 @@ export default function CartPage() {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Đang tải...</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('loading') || 'Loading...'}</h1>
       </div>
     );
   }
@@ -95,36 +106,36 @@ export default function CartPage() {
   if (error) {
     return (
       <>
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Lỗi</h1>
-        <p className="text-red-500 text-lg">{error}</p>
-        <button
-          onClick={fetchCart}
-          className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md"
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('error') || 'Error'}</h1>
+          <p className="text-red-500 text-lg">{error}</p>
+          <button
+            onClick={fetchCart}
+            className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md"
           >
-          Thử lại
-        </button>
-      </div>
-      <FooterPage />
-          </>
+            {t('retry') || 'Retry'}
+          </button>
+        </div>
+        <FooterPage />
+      </>
     );
   }
 
   if (cart.length === 0) {
     return (
       <>
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Giỏ hàng của bạn</h1>
-        <p className="text-gray-500 text-lg">Giỏ hàng của bạn đang trống.</p>
-        <Link href="/products">
-          <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md">
-            Tiếp tục mua sắm
-          </button>
-        </Link>
-      </div>
-      <FooterPage />
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('title') || 'Your Cart'}</h1>
+          <p className="text-gray-500 text-lg">{t('empty') || 'Your cart is empty.'}</p>
+          <Link href="/products">
+            <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md">
+              {t('continueShopping') || 'Continue Shopping'}
+            </button>
+          </Link>
+        </div>
+        <FooterPage />
       </>
     );
   }
@@ -133,7 +144,9 @@ export default function CartPage() {
     <>
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Giỏ hàng của bạn ({totalItems} sản phẩm)</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          {t('title') || 'Your Cart'} ({totalItems} {t('items') || 'items'})
+        </h1>
         <div className="space-y-4">
           {cart.map((item) => (
             <div
@@ -150,9 +163,9 @@ export default function CartPage() {
               />
               <div className="ml-4 flex-grow">
                 <h2 className="text-lg font-semibold">{item.productName}</h2>
-                <p className="text-gray-600">{item.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
-                <h2 className="text-lg">Kích cỡ: {item.size || 'N/A'}</h2>
-                <h2 className="text-lg">Thương hiệu: {item.brand || 'N/A'}</h2>
+                <p className="text-gray-600">{formatPrice(item.price)}</p>
+                <h2 className="text-lg">{tProduct('size')}: {item.size || 'N/A'}</h2>
+                <h2 className="text-lg">{tProduct('brand')}: {item.brand || 'N/A'}</h2>
                 <div className="flex items-center mt-2">
                   <button
                     onClick={() => handleUpdateQuantity(item.productId, item.quantity - 1)}
@@ -174,11 +187,11 @@ export default function CartPage() {
                     className="ml-4 text-red-500 hover:text-red-700"
                     disabled={loading}
                   >
-                    Xóa
+                    {t('remove') || 'Remove'}
                   </button>
                 </div>
               </div>
-              <p className="font-bold">{(item.price * item.quantity).toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
+              <p className="font-bold">{formatPrice(item.price * item.quantity)}</p>
             </div>
           ))}
         </div>
@@ -188,16 +201,18 @@ export default function CartPage() {
             className="text-red-500 hover:text-red-700"
             disabled={loading}
           >
-            Xóa toàn bộ giỏ hàng
+            {t('clearCart') || 'Clear Cart'}
           </button>
           <div>
-            <p className="text-xl font-bold">Tổng cộng: {totalPrice.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND</p>
+            <p className="text-xl font-bold">
+              {t('total') || 'Total'}: {formatPrice(totalPrice)}
+            </p>
             <button
               onClick={handleCheckout}
               className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md"
               disabled={loading}
             >
-              Tiến hành thanh toán
+              {t('checkout') || 'Checkout'}
             </button>
           </div>
         </div>

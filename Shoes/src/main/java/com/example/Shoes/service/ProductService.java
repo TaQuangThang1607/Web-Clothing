@@ -12,7 +12,7 @@ import com.example.Shoes.Model.dto.ProductDTO;
 
 public interface ProductService {
     Page<ProductDTO> getAllProductsAndFilter(Pageable pageable, String search, String brand, Double minPrice, Double maxPrice);
-    Page<ProductDTO> getAllProducts(Pageable pageable);
+    Page<ProductDTO> getAllProducts(Pageable pageable, String search, String brand);
     ProductDTO getProductById(Long id);
     ProductDTO createProduct(ProductDTO dto, MultipartFile image);
     ProductDTO updateProduct(Long id, ProductDTO dto, MultipartFile image);

@@ -1,7 +1,10 @@
 package com.example.Shoes.Service.impl;
 
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +16,7 @@ import com.example.Shoes.Model.dto.UserDTO;
 import com.example.Shoes.Model.mapper.UserMapper;
 import com.example.Shoes.Repository.UserRepository;
 import com.example.Shoes.Service.UserService;
+import com.example.Shoes.utils.error.IdInvalidException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -97,6 +101,31 @@ public class UserServiceImpl implements UserService{
         User updatedUser = userRepository.save(existingUser);
         return userMapper.toDto(updatedUser);
     }
+
+   @Override
+   public void generateResetPasswordToken(String email) throws IdInvalidException {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            throw new IdInvalidException("Email không tồn tại");
+        }
+
+        User user = userOpt.get();
+        String resetToken = UUID.randomUUID().toString();
+        user.setResetPasswordToken(resetToken);
+        user.setResetPasswordTokenExpiry(Instant.now().plus(15, ChronoUnit.MINUTES));
+        userRepository.save(user);
+   }
+
+   @Override
+   public User verifyResetPasswordToken(String token) throws IdInvalidException {
+    User user = userRepository.findByResetPasswordToken(token)
+            .orElseThrow(() -> new IdInvalidException("Token đặt lại mật khẩu không hợp lệ"));
+
+        if (user.getResetPasswordTokenExpiry().isBefore(Instant.now())) {
+            throw new IdInvalidException("Token đã hết hạn");
+        }
+        return user;
+   }
 
 
     

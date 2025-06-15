@@ -1,9 +1,7 @@
 import { fetchWithTokenRefresh } from "./apiService";
 
-// Định nghĩa API URL cho admin order
 const ADMIN_ORDER_API_URL = 'http://localhost:8080/admin/order';
 
-// Giao diện cho OrderDTO (dựa trên OrderDetailDTO.java)
 export interface OrderDTO {
   id?: number;
   orderCode?: string;
@@ -11,14 +9,13 @@ export interface OrderDTO {
   paymentMethod: string;
   status?: string;
   createdAt?: string;
-  receiverName?: string; 
-  receiverAddress?: string; 
-  receiverPhone?: string; 
+  receiverName?: string;
+  receiverAddress?: string;
+  receiverPhone?: string;
   receiverNote?: string;
   items?: OrderItem[] | null;
 }
 
-// Giao diện cho OrderItem (dựa trên OrderDetailDTO.Item)
 export interface OrderItem {
   productId: number;
   productName: string;
@@ -29,7 +26,6 @@ export interface OrderItem {
   price: number;
 }
 
-// Giao diện cho phản hồi phân trang
 export interface PagedResponse<T> {
   content: T[];
   page: number;
@@ -37,15 +33,29 @@ export interface PagedResponse<T> {
   totalPages: number;
 }
 
-// Hàm lấy danh sách đơn hàng cho admin
-export async function getAllOrdersApi(page: number = 0, size: number = 10): Promise<PagedResponse<OrderDTO>> {
-  // Kiểm tra vai trò admin trước khi gọi API
+export async function getAllOrdersApi(
+  page: number = 0,
+  size: number = 10,
+  search: string = '',
+  status: string = '',
+  startDate: string = '',
+  endDate: string = ''
+): Promise<PagedResponse<OrderDTO>> {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   if (!user || user.role !== 'ADMIN') {
     throw new Error('Chỉ admin mới có quyền truy cập danh sách đơn hàng');
   }
 
-  return fetchWithTokenRefresh<PagedResponse<OrderDTO>>(`${ADMIN_ORDER_API_URL}?page=${page}&size=${size}`, {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    size: size.toString(),
+  });
+  if (search) params.append('search', search);
+  if (status) params.append('status', status);
+  if (startDate) params.append('startDate', startDate);
+  if (endDate) params.append('endDate', endDate);
+
+  return fetchWithTokenRefresh<PagedResponse<OrderDTO>>(`${ADMIN_ORDER_API_URL}?${params.toString()}`, {
     method: 'GET',
     credentials: 'include',
   });

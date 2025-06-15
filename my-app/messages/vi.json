@@ -1,15 +1,119 @@
 {
-  "HomePage": {
-    "title": "xin chào thế giới",
-    "about": "đi vào trang page"
+  "common": {
+    "forgotPassword": {
+      "title": "Quên Mật Khẩu",
+      "emailLabel": "Địa chỉ Email",
+      "submitButton": "Gửi Liên Kết Đặt Lại",
+      "successMessage": "Nếu tài khoản tồn tại, liên kết đặt lại mật khẩu đã được gửi đến email của bạn.",
+      "errorMessage": "Gửi liên kết đặt lại thất bại. Vui lòng thử lại.",
+      "backToLogin": "Quay lại Đăng nhập"
+    },
+    "resetPassword": {
+      "title": "Đặt Lại Mật Khẩu",
+      "newPasswordLabel": "Mật Khẩu Mới",
+      "confirmPasswordLabel": "Xác Nhận Mật Khẩu",
+      "submitButton": "Đặt Lại Mật Khẩu",
+      "successMessage": "Mật khẩu đã được đặt lại thành công. Đang chuyển hướng đến đăng nhập...",
+      "errorMessage": "Đặt lại mật khẩu thất bại. Vui lòng thử lại.",
+      "invalidToken": "Token đặt lại không hợp lệ hoặc bị thiếu.",
+      "backToForgot": "Quay lại Quên Mật Khẩu",
+      "passwordMismatch": "Mật khẩu không khớp."
+    }
   },
-  "Header": {
+  "HomePage": {
+    "title": "Xin chào thế giới!",
+    "about": "Đi đến trang về chúng tôi"
+  },
+  "Features": {
+    "freeShippingTitle": "Miễn phí vận chuyển",
+    "freeShippingDesc": "Thưởng thức vận chuyển miễn phí cho tất cả đơn hàng trên 1.000.000 VNĐ.",
+    "securePaymentTitle": "Thanh toán bảo mật",
+    "securePaymentDesc": "100% phương thức thanh toán bảo mật.",
+    "returnPolicyTitle": "Trả hàng trong 30 ngày",
+    "returnPolicyDesc": "Đảm bảo hoàn tiền trong 30 ngày.",
+    "supportTitle": "Hỗ trợ 24/7",
+    "supportDesc": "Hỗ trợ khách hàng nhanh chóng mọi lúc."
+  },
+  
+  "Navigation": {
+    "home": "Trang Chủ",
+    "products": "Sản Phẩm",
+    "admin": "Quản Trị",
+    "orderHistory": "Lịch Sử Đơn Hàng",
+    "cart": "Giỏ Hàng",
+    "login": "Đăng Nhập",
+    "logout": "Đăng Xuất",
+    "profile": "Hồ Sơ",
+    "language": "Ngôn Ngữ"
+  },
+  "User": {
+    "greeting": "Xin chào, {name}",
+    "adminPanel": "Bảng Điều Khiển Quản Trị",
+    "logout": "Đăng Xuất",
+    "orderHistory": "Lịch Sử Đơn Hàng"
+  },
+  "Cart": {
+  "title": "Giỏ hàng của bạn",
+  "empty": "Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy tiếp tục mua sắm!",
+  "items": "sản phẩm",
+  "loading": "Đang tải...",
+  "error": "Lỗi",
+  "retry": "Thử lại",
+  "continueShopping": "Tiếp tục mua sắm",
+  "remove": "Xóa",
+  "clearCart": "Xóa toàn bộ giỏ hàng",
+  "total": "Tổng cộng",
+  "checkout": "Tiến hành thanh toán"
+},
+  "Product": {
+  "featured": "Sản Phẩm Nổi Bật",
+  "latest": "Sản Phẩm Mới Nhất",
+  "price": "Giá",
+  "addToCart": "Thêm vào Giỏ Hàng",
+  "view": "Xem",
+  "added": "Đã thêm",
+  "noDescription": "Không có mô tả",
+  "shopNow": "Mua ngay",
+  "details": "Chi tiết sản phẩm",
+  "description": "Mô tả",
+  "viewAll": "Xem Tất Cả",
+  "reviews": "Đánh giá",
+  "loading": "Đang tải...",
+  "notFound": "Không tìm thấy sản phẩm",
+  "size": "Kích cỡ",
+  "brand": "Thương hiệu",
+  "reviewer1": {
+    "name": "Nguyễn Văn A",
+    "comment": "Sản phẩm rất chất lượng, giao hàng nhanh!"
+  },
+  "reviewer2": {
+    "name": "Trần Thị B",
+    "comment": "Mình rất hài lòng, sẽ mua lần sau ❤️"
+  },
+  "reviewer3": {
+    "name": "Lê Văn C",
+    "comment": "Đóng gói cẩn thận, sản phẩm đúng mô tả."
+  }
+}
+,
+"Footer": {
     "home": "Trang chủ",
     "products": "Sản phẩm",
-    "login": "Đăng nhập",
-    "cart": "Giỏ hàng",
-    "logout": "Đăng xuất",
-    "admin": "Trang quản trị",
-    "history": "Lịch sử"
+    "contact": "Liên hệ",
+    "copyright": "© {year} Cửa hàng giày trực tuyến. Bảo lưu mọi quyền."
+  },
+  "ProductPage": {
+    "searchTitle": "Tìm kiếm sản phẩm",
+    "searchPlaceholder": "Tìm sản phẩm...",
+    "sortBy": "Sắp xếp theo:",
+    "sortNameAsc": "Tên (A-Z)",
+    "sortNameDesc": "Tên (Z-A)",
+    "sortPriceAsc": "Giá (Thấp đến Cao)",
+    "sortPriceDesc": "Giá (Cao đến Thấp)",
+    "brand": "Thương hiệu",
+    "allProducts": "Tổng số sản phẩm",
+    "price": "Giá",
+    "noProductsFound": "Không tìm thấy sản phẩm phù hợp."
   }
+
 }

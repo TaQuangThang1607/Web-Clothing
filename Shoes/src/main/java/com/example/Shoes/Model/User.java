@@ -1,6 +1,7 @@
 package com.example.Shoes.Model;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -57,10 +58,18 @@ public class User implements Serializable{
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
 
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String resetPasswordToken;
+
+    @Column
+    private Instant resetPasswordTokenExpiry;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Cart cart;
+
+
 
    
 }

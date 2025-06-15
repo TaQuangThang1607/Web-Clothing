@@ -1,6 +1,10 @@
-'use client'
+'use client';
 
-export default function Featurs() {
+import { useTranslations } from 'next-intl';
+
+export default function Features() {
+  const t = useTranslations('Features');
+
   return (
     <div className="w-full bg-white py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,8 +14,8 @@ export default function Featurs() {
             <div className="w-16 h-16 flex items-center justify-center bg-green-600 text-white rounded-full mx-auto mb-5">
               <i className="fas fa-car-side fa-2x"></i>
             </div>
-            <h5 className="text-black font-semibold">Miễn phí vận chuyển</h5>
-            <p className="text-sm text-gray-600">Miễn phí cho đơn hàng trên 2.000.000 VND</p>
+            <h5 className="text-black font-semibold">{t('freeShippingTitle')}</h5>
+            <p className="text-sm text-gray-600">{t('freeShippingDesc')}</p>
           </div>
 
           {/* Feature 2 */}
@@ -19,8 +23,8 @@ export default function Featurs() {
             <div className="w-16 h-16 flex items-center justify-center bg-green-600 text-white rounded-full mx-auto mb-5">
               <i className="fas fa-user-shield fa-2x"></i>
             </div>
-            <h5 className="text-black font-semibold">Thanh toán bảo mật</h5>
-            <p className="text-sm text-gray-600">100% Thanh toán bảo mật</p>
+            <h5 className="text-black font-semibold">{t('securePaymentTitle')}</h5>
+            <p className="text-sm text-gray-600">{t('securePaymentDesc')}</p>
           </div>
 
           {/* Feature 3 */}
@@ -28,8 +32,8 @@ export default function Featurs() {
             <div className="w-16 h-16 flex items-center justify-center bg-green-600 text-white rounded-full mx-auto mb-5">
               <i className="fas fa-exchange-alt fa-2x"></i>
             </div>
-            <h5 className="text-black font-semibold">Trả hàng trong vòng 30 ngày</h5>
-            <p className="text-sm text-gray-600">Đảm bảo hoàn tiền trong 30 ngày</p>
+            <h5 className="text-black font-semibold">{t('returnPolicyTitle')}</h5>
+            <p className="text-sm text-gray-600">{t('returnPolicyDesc')}</p>
           </div>
 
           {/* Feature 4 */}
@@ -37,8 +41,8 @@ export default function Featurs() {
             <div className="w-16 h-16 flex items-center justify-center bg-green-600 text-white rounded-full mx-auto mb-5">
               <i className="fas fa-phone-alt fa-2x"></i>
             </div>
-            <h5 className="text-black font-semibold">Hỗ trợ 24/7</h5>
-            <p className="text-sm text-gray-600">Hỗ trợ mọi lúc nhanh chóng</p>
+            <h5 className="text-black font-semibold">{t('supportTitle')}</h5>
+            <p className="text-sm text-gray-600">{t('supportDesc')}</p>
           </div>
         </div>
       </div>

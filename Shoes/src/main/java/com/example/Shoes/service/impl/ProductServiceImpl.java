@@ -31,8 +31,18 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final FileStorageService fileStorageService;
 
-    public Page<ProductDTO> getAllProducts(Pageable pageable) {
-       return productRepository.findAll(pageable)
+    public Page<ProductDTO> getAllProducts(Pageable pageable, String search, String brand) {
+        Specification<Product> spec = Specification.where(null);
+
+        if (search != null && !search.isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("name")), "%" + search.toLowerCase() + "%"));
+        }
+
+        if (brand != null && !brand.isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.equal(cb.lower(root.get("brand")), brand.toLowerCase()));
+        }
+
+        return productRepository.findAll(spec, pageable)
                 .map(productMapper::toDto);
     }
 

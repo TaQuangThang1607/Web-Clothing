@@ -1,7 +1,8 @@
+// services/apiService.ts
 import { User } from "../types/user";
 
-// services/apiService.ts
 const API_URL = 'http://localhost:8080/api/v1/auth';
+const ADMIN_API_URL = 'http://localhost:8080/api/admin';
 
 interface ApiResponse<T> {
   status: number;
@@ -19,9 +20,15 @@ interface AccountData {
   user: User;
 }
 
+interface DashboardSummary {
+  totalRevenue: number;
+  totalOrders: number;
+  ordersByStatus: Record<string, number>;
+  topProducts: { id: number; name: string; sold: number; quantity: number }[];
+  lowStockProducts: { id: number; name: string; sold: number; quantity: number }[];
+}
+
 export async function fetchWithTokenRefresh<T>(url: string, options: RequestInit): Promise<T> {
-  
-  
   const accessToken = localStorage.getItem('access_token');
   const isFormData = options.body instanceof FormData;
 
@@ -32,9 +39,11 @@ export async function fetchWithTokenRefresh<T>(url: string, options: RequestInit
   };
 
   const res = await fetch(url, { ...options, headers, credentials: 'include' });
-    if (res.status === 200 && (options.method === 'DELETE' || options.method === 'PUT')) {
-        return undefined as T; 
-    }
+
+  if (res.status === 200 && (options.method === 'DELETE' || options.method === 'PUT')) {
+    return undefined as T;
+  }
+
   if (res.status === 204) {
     return {
       content: [],
@@ -143,7 +152,6 @@ export async function loginApi(email: string, password: string): Promise<LoginDa
     const contentType = res.headers.get('Content-Type');
     if (contentType && contentType.includes('application/json')) {
       const errorResponse = await res.json();
-      // Ném lỗi với thông báo từ trường "error"
       throw new Error(errorResponse.error || 'Đăng nhập thất bại');
     } else {
       const errorText = await res.text();
@@ -157,7 +165,7 @@ export async function loginApi(email: string, password: string): Promise<LoginDa
     email: response.data.user.email,
     fullName: response.data.user.fullName,
     roleId: response.data.user.roleId,
-    role: response.data.user.role
+    role: response.data.user.role,
   };
   return { access_token: response.data.access_token, user };
 }
@@ -168,7 +176,6 @@ export async function getAccountApi(): Promise<User> {
     credentials: 'include',
   }).then((data) => data.user);
 }
-
 
 export async function registerApi(userData: {
   email: string;
@@ -191,4 +198,11 @@ export async function registerApi(userData: {
 
   const response = await res.json();
   return response.data; // Trả về user từ ApiResponse
+}
+
+export async function getDashboardSummary(startDate: string, endDate: string): Promise<DashboardSummary> {
+  return fetchWithTokenRefresh<DashboardSummary>(`${ADMIN_API_URL}/dashboard/summary?startDate=${startDate}&endDate=${endDate}`, {
+    method: 'GET',
+    credentials: 'include',
+  });
 }

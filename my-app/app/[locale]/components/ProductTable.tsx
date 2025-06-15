@@ -30,7 +30,7 @@ export default function ProductTable({ products, currentPage, totalPages, onPage
             <th className="border p-2">ID</th>
             <th className="border p-2">Tên</th>
             <th className="border p-2">Giá</th>
-            <th className="border p-2">Size</th>
+            <th className="border p-2">brand</th>
             <th className="border p-2">Màu</th>
             <th className="border p-2">Hành động</th>
           </tr>
@@ -44,7 +44,7 @@ export default function ProductTable({ products, currentPage, totalPages, onPage
                 <td className="border p-2">
                   {p.price != null ? p.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) : 'N/A'}
                 </td>
-                <td className="border p-2">{p.size}</td>
+                <td className="border p-2">{p.brand}</td>
                 <td className="border p-2">{p.color}</td>
                 <td className="border p-2">
                   <Link href={`/admin/products/update/${p.id}`} className="text-blue-500 hover:underline mr-2">
@@ -66,7 +66,7 @@ export default function ProductTable({ products, currentPage, totalPages, onPage
           )}
         </tbody>
       </table>
-      <div className="mt-4 flex justify-center space-x-2">
+      <div className="mt-4 flex justify-center space-x-2 text-black">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 0}

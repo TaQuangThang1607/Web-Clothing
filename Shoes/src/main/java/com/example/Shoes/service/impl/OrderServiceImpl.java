@@ -15,9 +15,8 @@ import com.example.Shoes.Model.Product;
 import com.example.Shoes.Model.User;
 import com.example.Shoes.Model.dto.order.OrderDTO;
 import com.example.Shoes.Model.dto.order.OrderHistory;
-import com.example.Shoes.Model.mapper.OrderMapper;
 import com.example.Shoes.Repository.OrderHistoryRepository;
-import com.example.Shoes.Repository.OrderReposotory;
+import com.example.Shoes.Repository.OrderRepository;
 import com.example.Shoes.Repository.ProductRepository;
 import com.example.Shoes.Repository.UserRepository;
 import com.example.Shoes.Service.OrderService;
@@ -29,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class OrderServiceImpl implements OrderService{
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final OrderReposotory orderRepository;
+    private final OrderRepository orderRepository;
     private final OrderHistoryRepository orderHistoryRepository;
 
     @Override
@@ -52,14 +51,22 @@ public class OrderServiceImpl implements OrderService{
                     Product product = productRepository.findById(item.getProductId())
                             .orElseThrow(() -> new RuntimeException("Product not found: " + item.getProductId()));
 
-                    OrderDetail detail = new OrderDetail();
+                    // Kiểm tra số lượng sản phẩm có đủ không
                     if (product.getQuantity() < item.getQuantity()) {
-                            throw new RuntimeException("Insufficient stock for product: " + item.getProductId());
-                        }
+                        throw new RuntimeException("Insufficient stock for product: " + item.getProductId());
+                    }
+
+                    // Cập nhật số lượng sản phẩm trong kho
+                    product.setQuantity(product.getQuantity() - item.getQuantity());
+                    product.setSold(product.getSold() + item.getQuantity());
+                    productRepository.save(product);
+
+                    OrderDetail detail = new OrderDetail();
                     detail.setOrder(order);
                     detail.setProduct(product);
                     detail.setQuantity(item.getQuantity());
-                    detail.setPrice(product.getPrice()); // Lưu giá tại thời điểm đặt hàng
+                    detail.setPrice(product.getPrice());
+                    
                     return detail;  
                 }).collect(Collectors.toList());
 

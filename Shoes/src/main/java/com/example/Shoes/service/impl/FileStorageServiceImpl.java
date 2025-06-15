@@ -20,7 +20,7 @@ import com.example.Shoes.utils.exception.FileStorageException;
 public class FileStorageServiceImpl implements FileStorageService {
     private static final Logger logger = LoggerFactory.getLogger(FileStorageServiceImpl.class);
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-    private static final String[] ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif"};
+    private static final String[] ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif",".webp"};
 
     @Value("${file.upload-dir}")
     private String uploadDir;

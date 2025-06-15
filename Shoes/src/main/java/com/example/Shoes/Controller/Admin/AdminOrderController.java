@@ -25,9 +25,13 @@ public class AdminOrderController {
     @GetMapping
     public ResponseEntity<PagedResponse<OrderDTO>> getAllOrders(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        
-            Page<OrderDTO> orderPage = adminOrderServiceImpl.getPageAllOrders(PageRequest.of(page, size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+
+            Page<OrderDTO> orderPage = adminOrderServiceImpl.getPageAllOrders(PageRequest.of(page, size), search, status, startDate, endDate);
             if(orderPage.isEmpty()){
                 return ResponseEntity.noContent().build();
             }

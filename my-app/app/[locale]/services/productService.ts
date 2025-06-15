@@ -11,12 +11,24 @@ interface ProductListResponse {
   totalPages: number;
 }
 
-
 // Lấy danh sách sản phẩm
-export async function getAllProducts(page: number = 0, size: number = 10): Promise<ProductListResponse> {
+// Lấy danh sách sản phẩm
+export async function getAllProducts(
+  page: number = 0,
+  size: number = 10,
+  search: string = '',
+  brand: string = ''
+): Promise<ProductListResponse> {
   try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+    });
+    if (search) params.append('search', search);
+    if (brand) params.append('brand', brand);
+
     const data = await fetchWithTokenRefresh<ProductListResponse>(
-      `${API_URL}?page=${page}&size=${size}`,
+      `${API_URL}?${params.toString()}`,
       {
         method: 'GET',
         headers: {

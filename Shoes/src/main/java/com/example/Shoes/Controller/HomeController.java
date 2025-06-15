@@ -66,7 +66,8 @@ public class HomeController {
     ) {
         return productService.getBrandsCount(search, minPrice, maxPrice);
     }
- @PostMapping("/register")
+    
+    @PostMapping("/register")
     public ResponseEntity<?> registerUser(
         @Valid @RequestBody UserDTO dto,
         BindingResult bindingResult

@@ -1,27 +1,41 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
-
 import Link from 'next/link';
 import { getAllOrdersApi, OrderDTO } from '../../services/adminOrderService';
 import { fetchWithTokenRefresh } from '../../services/apiService';
+import { debounce } from 'lodash';
 
 export default function AdminOrdersPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<OrderDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(
+    parseInt(searchParams.get('page') || '0')
+  );
   const [totalPages, setTotalPages] = useState<number>(0);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderDTO | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [isMounted, setIsMounted] = useState(false); // Kiểm soát render client-side
+  const [isMounted, setIsMounted] = useState(false);
+  const [searchTerm, setSearchTerm] = useState<string>(
+    searchParams.get('search') || ''
+  );
+  const [selectedStatus, setSelectedStatus] = useState<string>(
+    searchParams.get('status') || ''
+  );
+  const [startDate, setStartDate] = useState<string>(
+    searchParams.get('startDate') || ''
+  );
+  const [endDate, setEndDate] = useState<string>(
+    searchParams.get('endDate') || ''
+  );
 
-  // Danh sách trạng thái từ backend
   const orderStatuses = [
     { value: 'PENDING', label: 'Chờ xử lý' },
     { value: 'PROCESSING', label: 'Đang xử lý' },
@@ -30,7 +44,6 @@ export default function AdminOrdersPage() {
     { value: 'CANCELLED', label: 'Đã hủy' },
     { value: 'RETURNED', label: 'Trả hàng' },
   ];
-
 
   useEffect(() => {
     setIsMounted(true);
@@ -41,11 +54,17 @@ export default function AdminOrdersPage() {
     }
   }, [router]);
 
-  // Lấy danh sách đơn hàng
-  const fetchOrders = async (page: number = 0, size: number = 10) => {
+  const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await getAllOrdersApi(page, size);
+      const response = await getAllOrdersApi(
+        currentPage,
+        10,
+        searchTerm,
+        selectedStatus,
+        startDate,
+        endDate
+      );
       setOrders(response.content);
       setTotalPages(response.totalPages);
       setCurrentPage(response.page);
@@ -58,7 +77,6 @@ export default function AdminOrdersPage() {
     }
   };
 
-  // Lấy chi tiết đơn hàng
   const fetchOrderDetails = async (orderId: number) => {
     setIsLoadingDetails(true);
     try {
@@ -75,7 +93,6 @@ export default function AdminOrdersPage() {
     }
   };
 
-  // Mở modal chi tiết đơn hàng
   const openDetailModal = (order: OrderDTO) => {
     if (!order.id) {
       toast.error('Không thể xem chi tiết: Đơn hàng không có ID');
@@ -84,7 +101,6 @@ export default function AdminOrdersPage() {
     fetchOrderDetails(order.id);
   };
 
-  // Mở modal xác nhận xóa
   const openDeleteConfirmModal = (order: OrderDTO) => {
     if (!order.id) {
       toast.error('Không thể xóa: Đơn hàng không có ID');
@@ -98,7 +114,6 @@ export default function AdminOrdersPage() {
     setIsDeleteConfirmOpen(true);
   };
 
-  // Xử lý xóa đơn hàng
   const handleDeleteOrder = async () => {
     if (!selectedOrder?.id) {
       toast.error('Không thể xóa: ID đơn hàng không tồn tại');
@@ -120,22 +135,61 @@ export default function AdminOrdersPage() {
     }
   };
 
-  // Chuyển trang
   const handlePageChange = (newPage: number) => {
     if (newPage >= 0 && newPage < totalPages) {
-      fetchOrders(newPage);
+      setCurrentPage(newPage);
+      updateUrl({ page: newPage.toString() });
     }
+  };
+
+  const debouncedSearch = debounce((value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(0);
+    updateUrl({ search: value, page: '0' });
+  }, 500);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedSearch(e.target.value);
+  };
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatus = e.target.value;
+    setSelectedStatus(newStatus);
+    setCurrentPage(0);
+    updateUrl({ status: newStatus, page: '0' });
+  };
+
+  const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
+    if (field === 'startDate') {
+      setStartDate(value);
+    } else {
+      setEndDate(value);
+    }
+    setCurrentPage(0);
+    updateUrl({ [field]: value, page: '0' });
+  };
+
+  const updateUrl = (params: { [key: string]: string }) => {
+    const urlParams = new URLSearchParams(searchParams);
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) urlParams.set(key, value);
+      else urlParams.delete(key);
+    });
+    if (searchTerm) urlParams.set('search', searchTerm);
+    if (selectedStatus) urlParams.set('status', selectedStatus);
+    if (startDate) urlParams.set('startDate', startDate);
+    if (endDate) urlParams.set('endDate', endDate);
+    router.push(`/admin/orders?${urlParams.toString()}`);
   };
 
   useEffect(() => {
     if (isMounted) {
       fetchOrders();
     }
-  }, [isMounted]);
+  }, [isMounted, currentPage, searchTerm, selectedStatus, startDate, endDate]);
 
-  // Không render gì cho đến khi mounted trên client
   if (!isMounted) {
-    return null; // Hoặc một loading spinner
+    return null;
   }
 
   if (loading) {
@@ -164,14 +218,53 @@ export default function AdminOrdersPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Quản lý đơn hàng</h1>
-      <button
-        onClick={() => fetchOrders(currentPage)}
-        className="mb-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
-      >
-        Làm mới
-      </button>
+      <div className="flex justify-between mb-4">
+        <div className="flex gap-4">
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo mã đơn hàng hoặc tên người nhận..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <select
+            value={selectedStatus}
+            onChange={handleStatusChange}
+            className="px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Tất cả trạng thái</option>
+            {orderStatuses.map((status) => (
+              <option key={status.value} value={status.value}>
+                {status.label}
+              </option>
+            ))}
+          </select>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => handleDateChange('startDate', e.target.value)}
+            className="px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => handleDateChange('endDate', e.target.value)}
+            className="px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <button
+          onClick={() => fetchOrders()}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
+        >
+          Làm mới
+        </button>
+      </div>
       {orders.length === 0 ? (
-        <p className="text-gray-500 text-lg">Không có đơn hàng nào.</p>
+        <p className="text-gray-500 text-lg">
+          {searchTerm || selectedStatus || startDate || endDate
+            ? 'Không tìm thấy đơn hàng nào phù hợp với bộ lọc.'
+            : 'Không có đơn hàng nào.'}
+        </p>
       ) : (
         <>
           <div className="overflow-x-auto">

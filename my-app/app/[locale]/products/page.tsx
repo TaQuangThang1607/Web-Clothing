@@ -3,7 +3,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import debounce from 'lodash/debounce';
-
 import { toast } from 'react-toastify';
 import { Product } from '../types/product';
 import { getAllPageProducts, getBrandsCount } from '../services/client/viewpageProduct';
@@ -11,10 +10,10 @@ import { PageResponse } from '../types/dto/apiResponse';
 import { addToCartApi } from '../services/client/CartService';
 import Header from '../components/Header';
 import FooterPage from '../components/Footer';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
-const API_BASE_URL ='http://localhost:8080';
-// app/products/page.tsx
+const API_BASE_URL = 'http://localhost:8080';
+
 export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,16 +29,26 @@ export default function ProductsPage() {
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000000 });
   const locale = useLocale();
 
+  const t = useTranslations('ProductPage');
+  const tProduct = useTranslations('Product');
+
   const [brands, setBrands] = useState([
-    { name: 'Nike', count: 0 },
-    { name: 'Converse', count: 0 },
-    { name: 'Adidas', count: 0 },
-    { name: 'Jordan', count: 0 },
-    { name: 'Vans', count: 0 },
+    { name: 'Nike' },
+    { name: 'Converse'},
+    { name: 'Adidas'},
+    { name: 'Jordan'},
+    { name: 'Vans'},
   ]);
 
   const [addedToCartIds, setAddedToCartIds] = useState<Set<number>>(new Set());
 
+  // Hàm định dạng giá theo locale
+  const formatPrice = (price: number) => {
+    if (locale === 'vi') {
+      return price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) + ' VND';
+    }
+    return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 0 });
+  };
 
   // Đọc brand từ URL khi tải trang
   useEffect(() => {
@@ -116,19 +125,17 @@ export default function ProductsPage() {
     try {
       await addToCartApi(product.id, 1);
       setAddedToCartIds((prev) => new Set(prev).add(product.id));
-      toast.success(`${product.name} đã được thêm vào giỏ hàng`);
+      toast.success(`${product.name} ${tProduct('added')}`);
     } catch (err: any) {
       toast.error(err.message || 'Lỗi khi thêm sản phẩm vào giỏ hàng');
     }
   };
 
-
   if (loading) {
     return (
       <>
-        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Tìm kiếm sản phẩm</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('searchTitle')}</h1>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
               <div className="space-y-6 animate-pulse">
@@ -160,7 +167,6 @@ export default function ProductsPage() {
             </div>
           </div>
         </div>
-        
       </>
     );
   }
@@ -168,11 +174,9 @@ export default function ProductsPage() {
   if (error) {
     return (
       <>
-        
         <div className="flex justify-center items-center h-screen">
           <div className="text-red-500">{error}</div>
         </div>
-        
       </>
     );
   }
@@ -182,7 +186,7 @@ export default function ProductsPage() {
       <Header />
       <div className="bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Tìm kiếm sản phẩm</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('searchTitle')}</h1>
           <div className="grid grid-cols-1 gap-6">
             <div className="col-span-1">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -191,7 +195,7 @@ export default function ProductsPage() {
                     <input
                       type="search"
                       className="text-black flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Search products..."
+                      placeholder={t('searchPlaceholder')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -208,17 +212,17 @@ export default function ProductsPage() {
                 <div className="lg:col-span-5"></div>
                 <div className="lg:col-span-3">
                   <div className="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
-                    <label htmlFor="sort" className="text-gray-700">Sắp xếp theo:</label>
+                    <label htmlFor="sort" className="text-gray-700">{t('sortBy')}</label>
                     <select
                       id="sort"
                       className="bg-gray-50 border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded text-black"
                       value={sort}
                       onChange={(e) => setSort(e.target.value)}
                     >
-                      <option value="name,asc">Tên (A-Z)</option>
-                      <option value="name,desc">Tên (Z-A)</option>
-                      <option value="price,asc">Giá (Thấp đến Cao)</option>
-                      <option value="price,desc">Giá (Cao đến Thấp)</option>
+                      <option value="name,asc">{t('sortNameAsc')}</option>
+                      <option value="name,desc">{t('sortNameDesc')}</option>
+                      <option value="price,asc">{t('sortPriceAsc')}</option>
+                      <option value="price,desc">{t('sortPriceDesc')}</option>
                     </select>
                   </div>
                 </div>
@@ -227,7 +231,7 @@ export default function ProductsPage() {
                 <div className="lg:col-span-3">
                   <div className="space-y-6">
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-900">Thương hiệu</h4>
+                      <h4 className="text-lg font-semibold text-gray-900">{t('brand')}</h4>
                       <ul className="space-y-2">
                         <li
                           className={`flex justify-between items-center cursor-pointer ${selectedBrand === null ? 'text-blue-500 font-medium' : 'text-gray-700 hover:text-blue-500'}`}
@@ -237,7 +241,7 @@ export default function ProductsPage() {
                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Tổng sản phẩm
+                            {t('allProducts')}
                           </span>
                           <span className="text-gray-500">({allProducts.length})</span>
                         </li>
@@ -253,13 +257,12 @@ export default function ProductsPage() {
                               </svg>
                               {brand.name}
                             </span>
-                            <span className="text-gray-500">({brand.count})</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Giá tiền</h4>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">{t('price')}</h4>
                       <input
                         type="range"
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
@@ -269,10 +272,9 @@ export default function ProductsPage() {
                         onChange={handlePriceChange}
                       />
                       <div className="flex justify-between text-gray-700">
-                        <span>0 đ</span>
+                        <span>{locale === 'vi' ? '0 đ' : '$0'}</span>
                         <span>
-{priceRange.max!= null ? `${priceRange.max.toLocaleString('vi-VN', { minimumFractionDigits: 0 })} VND` : 'N/A'} 
-
+                          {priceRange.max != null ? formatPrice(priceRange.max) : 'N/A'}
                         </span>
                       </div>
                     </div>
@@ -295,12 +297,11 @@ export default function ProductsPage() {
                           </div>
                           <div className="p-4 border border-t-0 border-gray-200 rounded-b-lg">
                             <h4 className="text-lg font-semibold text-gray-900">{product.name}</h4>
-                            <p className="text-gray-600 text-sm line-clamp-2">{product.description || 'No description available'}</p>
+                            <p className="text-gray-600 text-sm line-clamp-2">{product.description || tProduct('noDescription')}</p>
                             <div className="flex justify-between items-center mt-4 flex-wrap">
-                              <p className="text-gray-900 font-bold text-lg"> 
-                                   {product.price != null ? product.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) : 'N/A'}  đ
+                              <p className="text-gray-900 font-bold text-lg">
+                                {product.price != null ? formatPrice(product.price) : 'N/A'}
                               </p>
-                                  
                               <button
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -312,11 +313,8 @@ export default function ProductsPage() {
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                 </svg>
-                                {addedToCartIds.has(product.id) ? 'Đã thêm' : 'Thêm sản phẩm vào giỏ hàng'}
+                                {addedToCartIds.has(product.id) ? tProduct('added') : tProduct('addToCart')}
                               </button>
-
-
-
                             </div>
                           </div>
                         </div>
@@ -324,7 +322,7 @@ export default function ProductsPage() {
                     ))}
                     {products.length === 0 && (
                       <div className="col-span-3 text-center py-10">
-                        <p className="text-gray-500 text-lg">No products found matching your search criteria.</p>
+                        <p className="text-gray-500 text-lg">{t('noProductsFound')}</p>
                       </div>
                     )}
                     <div className="col-span-1 sm:col-span-2 lg:col-span-3">

@@ -39,7 +39,7 @@ public class Product implements Serializable{
     private String size;
 
     @NotNull(message = "Color is required")
-    @Size(max = 10, message = "Color must be less than 10 characters")
+    @Size(max = 50, message = "Color must be less than 10 characters")
     private String color;
 
     private String imageUrl;

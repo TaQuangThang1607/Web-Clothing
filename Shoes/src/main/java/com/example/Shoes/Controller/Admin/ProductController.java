@@ -38,9 +38,11 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<PagedResponse<ProductDTO>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String brand) {
         
-        Page<ProductDTO> productPage = productService.getAllProducts(PageRequest.of(page, size));
+        Page<ProductDTO> productPage = productService.getAllProducts(PageRequest.of(page, size), search, brand);
         
         if (productPage.isEmpty()) {
             return ResponseEntity.noContent().build();

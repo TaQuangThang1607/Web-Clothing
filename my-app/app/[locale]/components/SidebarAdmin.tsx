@@ -9,7 +9,7 @@ export default function SideBar() {
       
       <nav className="flex-1 overflow-y-auto p-4 space-y-2 text-sm">
         <div className="text-gray-400 uppercase text-xs">Core</div>
-        <a href="index.html" className="flex items-center space-x-2 hover:bg-gray-800 p-2 rounded">
+        <a href="/admin" className="flex items-center space-x-2 hover:bg-gray-800 p-2 rounded">
           <i className="fas fa-tachometer-alt" />
           <span>Dashboard</span>
         </a>

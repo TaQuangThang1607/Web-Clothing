@@ -1,5 +1,11 @@
-'use client'
-import { useState } from "react";
+'use client';
+
+import { FC, useState } from 'react';
+import { useTranslations } from 'next-intl';
+
+interface CarouselProps {
+  // Loại bỏ prop t vì tự quản lý trong component
+}
 
 const slides = [
   {
@@ -7,7 +13,7 @@ const slides = [
     type: 'single',
     image: 'https://themewagon.github.io/stylish/images/card-image1.jpg',
     title: 'Stylish shoes for Women',
-    alt: 'shoes'
+    alt: 'shoes',
   },
   {
     id: 2,
@@ -16,21 +22,21 @@ const slides = [
       {
         image: 'https://themewagon.github.io/stylish/images/card-image2.jpg',
         title: 'Sports Wear',
-        alt: 'shoes'
+        alt: 'shoes',
       },
       {
         image: 'https://themewagon.github.io/stylish/images/card-image3.jpg',
         title: 'Fashion Shoes',
-        alt: 'shoes'
-      }
-    ]
+        alt: 'shoes',
+      },
+    ],
   },
   {
     id: 3,
     type: 'single',
     image: 'https://themewagon.github.io/stylish/images/card-image5.jpg',
     title: 'Stylish shoes for men',
-    alt: 'shoes'
+    alt: 'shoes',
   },
   {
     id: 4,
@@ -39,18 +45,19 @@ const slides = [
       {
         image: 'https://themewagon.github.io/stylish/images/card-image6.jpg',
         title: 'Men Shoes',
-        alt: 'shoes'
+        alt: 'shoes',
       },
       {
-        image: 'images/card-image6.jpg',
+        image: 'images/card-image6.jpg', // Lưu ý: Đường dẫn này có thể cần sửa nếu không tồn tại
         title: 'Women Shoes',
-        alt: 'shoes'
-      }
-    ]
-  }
+        alt: 'shoes',
+      },
+    ],
+  },
 ];
 
-export default function Carousel() {
+const Carousel: FC<CarouselProps> = () => {
+  const t = useTranslations('Product');
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = () => {
@@ -69,9 +76,9 @@ export default function Carousel() {
     if (slide.type === 'single') {
       return (
         <div className="relative w-full h-96 lg:h-[500px] rounded-lg overflow-hidden group">
-          <img 
-            src={slide.image} 
-            alt={slide.alt} 
+          <img
+            src={slide.image}
+            alt={slide.alt}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
@@ -79,11 +86,11 @@ export default function Carousel() {
             <h2 className="text-3xl lg:text-5xl font-light mb-4 leading-tight">
               {slide.title}
             </h2>
-            <a 
-              href="#" 
+            <a
+              href="#"
               className="inline-block uppercase text-sm font-bold tracking-wider border-b border-white/50 pb-1 hover:border-white transition-colors duration-300"
             >
-              Shop Now
+              {t('shopNow')}
             </a>
           </div>
         </div>
@@ -94,21 +101,21 @@ export default function Carousel() {
       <div className="grid grid-cols-1 gap-4 h-96 lg:h-[500px]">
         {slide.items.map((item: any, index: number) => (
           <div key={index} className="relative rounded-lg overflow-hidden group">
-            <img 
-              src={item.image} 
-              alt={item.alt} 
+            <img
+              src={item.image}
+              alt={item.alt}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-4 lg:p-6 text-white">
               <h2 className="text-2xl lg:text-3xl font-light mb-3 leading-tight">
-                {item.title}
+                {item.title} {/* Có thể thay bằng t('itemTitle') nếu muốn dịch */}
               </h2>
-              <a 
-                href="#" 
+              <a
+                href="#"
                 className="inline-block uppercase text-xs font-bold tracking-wider border-b border-white/50 pb-1 hover:border-white transition-colors duration-300"
               >
-                Shop Now
+                {t('shopNow')} {/* Dịch "Shop Now" */}
               </a>
             </div>
           </div>
@@ -122,7 +129,7 @@ export default function Carousel() {
       <div className="max-w-7xl mx-auto">
         {/* Carousel Container */}
         <div className="relative overflow-hidden rounded-xl">
-          <div 
+          <div
             className="flex transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
@@ -138,17 +145,37 @@ export default function Carousel() {
             onClick={prevSlide}
             className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors duration-300 group"
           >
-            <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-5 h-5 group-hover:scale-110 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
-          
+
           <button
             onClick={nextSlide}
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors duration-300 group"
           >
-            <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              className="w-5 h-5 group-hover:scale-110 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </div>
@@ -160,8 +187,8 @@ export default function Carousel() {
               key={index}
               onClick={() => goToSlide(index)}
               className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-110 ${
-                currentSlide === index 
-                  ? 'bg-gray-800 scale-110' 
+                currentSlide === index
+                  ? 'bg-gray-800 scale-110'
                   : 'bg-gray-300 hover:bg-gray-400'
               }`}
             />
@@ -170,4 +197,6 @@ export default function Carousel() {
       </div>
     </section>
   );
-}
+};
+
+export default Carousel;

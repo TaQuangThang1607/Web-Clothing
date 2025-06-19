@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.example.Shoes.Model.Order;
 import com.example.Shoes.Model.OrderStatus;
 import com.example.Shoes.Model.dto.order.OrderDTO;
+import com.example.Shoes.Model.dto.order.UpdateStatusRequest;
 import com.example.Shoes.Model.mapper.OrderMapper;
 import com.example.Shoes.Repository.OrderRepository;
 import com.example.Shoes.Service.AdminOrderService;
@@ -82,4 +83,37 @@ public class AdminOrderServiceImpl implements AdminOrderService{
                 .orElseThrow(() -> new IllegalArgumentException("Đơn hàng không tồn tại: " + orderId));
         return orderMapper.toDto(order);
      }
+
+     @Override
+    public OrderDTO updateOrderStatus(Long orderId, UpdateStatusRequest request) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("Đơn hàng không tồn tại: " + orderId));
+        
+        if (request.getStatus() == null) {
+            throw new IllegalArgumentException("Trạng thái không được để trống");
+        }
+        
+        if (!isValidStatusTransition(order.getStatus(), request.getStatus())) {
+            throw new IllegalArgumentException("Không thể chuyển từ " + 
+                order.getStatus().getVietnameseName() + " sang " + 
+                request.getStatus().getVietnameseName());
+        }
+        
+        order.setStatus(request.getStatus());
+        
+        if (request.getNote() != null && !request.getNote().isEmpty()) {
+        }
+        
+        Order updatedOrder = orderRepository.save(order);
+        return orderMapper.toDto(updatedOrder);
+    }
+
+    private boolean isValidStatusTransition(OrderStatus current, OrderStatus newStatus) {
+        if (current == OrderStatus.CANCELLED || current == OrderStatus.RETURNED) {
+            return false;
+        }
+        
+       
+        return true;
+    }
 }

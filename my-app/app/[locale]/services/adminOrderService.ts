@@ -41,10 +41,11 @@ export async function getAllOrdersApi(
   startDate: string = '',
   endDate: string = ''
 ): Promise<PagedResponse<OrderDTO>> {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  if (!user || user.role !== 'ADMIN') {
-    throw new Error('Chỉ admin mới có quyền truy cập danh sách đơn hàng');
-  }
+  
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+if (!user || user.role !== 1) { 
+  throw new Error('Chỉ admin mới có quyền truy cập danh sách đơn hàng');
+}
 
   const params = new URLSearchParams({
     page: page.toString(),

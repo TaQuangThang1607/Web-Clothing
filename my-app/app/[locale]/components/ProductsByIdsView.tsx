@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { getAllProductsInClient } from '../services/client/clientService';
 import { Product } from '../types/product';
 import { PageResponse } from '../types/dto/apiResponse';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -15,6 +15,8 @@ export default function ProductsByIdsView() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+    const locale = useLocale();
+  
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
@@ -34,6 +36,15 @@ export default function ProductsByIdsView() {
 
     fetchFeaturedProducts();
   }, []);
+  const formatPrice = (price: number) => {
+    if (locale === 'vi') {
+      return price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) + ' VND';
+    }
+    // Chuyển đổi từ VND sang USD (1 USD = 26.100 VND)
+    const exchangeRate = 26100;
+    const priceInUSD = price / exchangeRate;
+    return '$' + priceInUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
 
   if (loading) {
     return (
@@ -107,8 +118,7 @@ export default function ProductsByIdsView() {
               <h2 className="font-semibold text-lg">{product.name}</h2>
               <p className="text-gray-600 text-sm line-clamp-2">{product.description || t('noDescription')}</p>
               <p className="text-green-600 font-bold mt-2">
-                ${product.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 })}
-              </p>
+{product.price != null ? formatPrice(product.price) : 'N/A'}              </p>
             </div>
           </div>
         ))}

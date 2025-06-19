@@ -47,7 +47,10 @@ export default function ProductsPage() {
     if (locale === 'vi') {
       return price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) + ' VND';
     }
-    return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 0 });
+    // Chuyển đổi từ VND sang USD (1 USD = 26.100 VND)
+    const exchangeRate = 26100;
+    const priceInUSD = price / exchangeRate;
+    return '$' + priceInUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   // Đọc brand từ URL khi tải trang
@@ -96,7 +99,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchProducts(currentPage, searchTerm, selectedBrand, priceRange.min, priceRange.max, sort);
-  }, [currentPage, searchTerm, selectedBrand, priceRange, sort, fetchProducts]);
+  }, [currentPage, selectedBrand, priceRange, sort, fetchProducts]); // <-- bỏ searchTerm
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -128,6 +131,19 @@ export default function ProductsPage() {
       toast.success(`${product.name} ${tProduct('added')}`);
     } catch (err: any) {
       toast.error(err.message || 'Lỗi khi thêm sản phẩm vào giỏ hàng');
+    }
+  };
+
+  // Hàm xử lý tìm kiếm khi nhấn nút hoặc Enter
+  const handleSearch = () => {
+    setCurrentPage(0);
+    fetchProducts(0, searchTerm, selectedBrand, priceRange.min, priceRange.max, sort);
+  };
+
+  // Bắt sự kiện Enter trong ô input
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
@@ -198,10 +214,11 @@ export default function ProductsPage() {
                       placeholder={t('searchPlaceholder')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
+                      onKeyDown={handleInputKeyDown} // Thêm dòng này
                     />
                     <span
                       className="bg-gray-100 p-3 border border-l-0 border-gray-300 rounded-r-md cursor-pointer hover:bg-gray-200"
-                      onClick={() => fetchProducts(currentPage, searchTerm, selectedBrand, priceRange.min, priceRange.max, sort)}
+                      onClick={handleSearch} // Đổi thành handleSearch
                     >
                       <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -286,6 +303,7 @@ export default function ProductsPage() {
                       <Link href={`/${locale}/products/${product.id}`} key={product.id}>
                         <div className="relative rounded-lg shadow-md overflow-hidden">
                           <div className="relative">
+                            <h2>{product.id}</h2>
                             <img
                               src={product.imageUrl?.startsWith('http') ? product.imageUrl : `${API_BASE_URL}${product.imageUrl || '/placeholder-product.png'}`}
                               alt={product.name}
@@ -325,7 +343,7 @@ export default function ProductsPage() {
                         <p className="text-gray-500 text-lg">{t('noProductsFound')}</p>
                       </div>
                     )}
-                    <div className="col-span-1 sm:col-span-2 lg:col-span-3">
+                    <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-black">
                       <div className="flex justify-center mt-8 space-x-2">
                         <button
                           onClick={() => handlePageChange(Math.max(0, currentPage - 1))}

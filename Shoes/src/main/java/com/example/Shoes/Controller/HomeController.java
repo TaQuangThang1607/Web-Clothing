@@ -9,6 +9,7 @@ import com.example.Shoes.utils.exception.ResourceNotFoundException;
 
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 
@@ -69,11 +69,20 @@ public class HomeController {
     
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
-        @Valid @RequestBody UserDTO dto,
+        @RequestBody UserDTO dto,
         BindingResult bindingResult
     ) throws IdInvalidException {
         logger.info("Registering new user with email: {}", dto.getEmail());
 
+        // Kiểm tra lỗi xác thực
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors()
+                    .stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", "));
+            logger.warn("Validation errors: {}", errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
 
         // Kiểm tra email trùng lặp
         boolean isEmailExist = this.userService.isEmailExist(dto.getEmail());

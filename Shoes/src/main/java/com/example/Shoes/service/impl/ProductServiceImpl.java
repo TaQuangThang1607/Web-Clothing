@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.persistence.criteria.Predicate;
 
@@ -125,14 +126,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
-
-        // Kiểm tra xem sản phẩm có được sử dụng trong CartDetail không
-        if (!product.getCartDetails().isEmpty()) {
-            throw new IllegalStateException("Cannot delete product with id: " + id + " as it is used in cart details");
-        }
 
         if (product.getImageUrl() != null) {
             fileStorageService.deleteFile(product.getImageUrl());

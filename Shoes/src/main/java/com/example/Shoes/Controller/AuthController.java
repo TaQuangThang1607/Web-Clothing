@@ -74,8 +74,7 @@ public ResponseEntity<RestLoginDTO> login(@RequestBody UserDTO dto) throws IdInv
             user.getId(), 
             user.getEmail(), 
             user.getFullName(),
-            user.getRole().getId(),
-            user.getRole().getName()
+            user.getRoleId()
         );
         restLoginDTO.setUser(userLogin);
 
@@ -128,8 +127,7 @@ public ResponseEntity<RestLoginDTO> login(@RequestBody UserDTO dto) throws IdInv
             user.getId(),
             user.getEmail(),
             user.getFullName(),
-            user.getRole().getId(),
-            user.getRole().getName()
+            user.getRoleId()
         );
         
         RestLoginDTO.UserGetAccount userGetAccount = new RestLoginDTO.UserGetAccount();
@@ -158,8 +156,7 @@ public ResponseEntity<RestLoginDTO> login(@RequestBody UserDTO dto) throws IdInv
             currentUser.getId(), 
             currentUser.getEmail(), 
             currentUser.getFullName(),
-            currentUser.getRole().getId(),
-            currentUser.getRole().getName()
+            currentUser.getRoleId()
         );
         restLoginDTO.setUser(userLogin);
 

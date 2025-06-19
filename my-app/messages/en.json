@@ -36,16 +36,18 @@
     "supportDesc": "Fast and reliable customer support anytime."
   },
   "Navigation": {
-  "home": "Home",
-  "products": "Products",
-  "admin": "Admin",
-  "orderHistory": "Order History",
-  "cart": "Cart",
-  "login": "Login",
-  "logout": "Logout",
-  "profile": "Profile",
-  "language": "Language"
-},
+    "home": "Home",
+    "products": "Products",
+    "admin": "Admin",
+    "orderHistory": "Order History",
+    "cart": "Cart",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "pageAdmin": "Admin Page",
+    "pageHistory": "Order History",
+    "language": "Language"
+  },
 "User": {
   "greeting": "Hello, {name}",
   "adminPanel": "Admin Panel",
@@ -72,6 +74,8 @@
   "addToCart": "Add to Cart",
   "view": "View",
   "shopNow": "Shop Now",
+  "stylish": "Stylish shoes for everyone",
+  "sportsWear": "Sports wear",
   "viewAll": "View All",
   "added": "Added",
   "noDescription": "No description",
@@ -114,6 +118,89 @@
     "allProducts": "Total Products",
     "price": "Price",
     "noProductsFound": "No matching products found."
+  },
+ 
+  "Login": {
+    "title": "Member Login",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "submitButton": "Login",
+    "forgot": "Forgot",
+    "forgotLink": "Username / Password?",
+    "registerLink": "Create your Account →",
+    "errorUnknown": "An unknown error occurred"
+  },
+
+  "Register": {
+    "title": "Create Account",
+    "fullNamePlaceholder": "Full Name",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "repeatPasswordPlaceholder": "Repeat Password",
+    "button": "Register",
+    "loading": "Registering...",
+    "success": "Registration successful! Redirecting to login...",
+    "passwordMismatch": "Passwords do not match",
+    "errorDefault": "Registration failed. Please try again.",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  },
+  
+  "OrderPage": {
+    "checkout": "Checkout",
+    "cartItems": "Items in cart ({totalItems} items)",
+    "shippingInfo": "Shipping Information",
+    "name": "Full Name",
+    "address": "Shipping Address",
+    "phone": "Phone Number",
+    "note": "Note (optional)",
+    "paymentMethod": "Payment Method",
+    "cash": "Cash",
+    "card": "Credit Card",
+    "transfer": "Bank Transfer",
+    "complete": "Complete Order",
+    "loading": "Loading...",
+    "error": "Error",
+    "emptyCart": "Cart is empty, please add products before checkout",
+    "fetchCartError": "Error loading cart",
+    "nameRequired": "Full name is required",
+    "nameMinLength": "Full name must be at least 2 characters",
+    "addressRequired": "Address is required",
+    "addressMinLength": "Address must be at least 5 characters",
+    "phoneRequired": "Phone number is required",
+    "phoneInvalid": "Invalid phone number (e.g., +84912345678)",
+    "invalidForm": "Please check and fill in all required fields correctly",
+    "emptyCartOrder": "Cart is empty, cannot create order",
+    "orderSuccess": "Order {orderCode} created successfully!",
+    "orderError": "Error creating order",
+    "continueShopping": "Continue Shopping",
+    "size": "Size",
+    "brand": "Brand",
+    "quantity": "Quantity",
+    "total": "Total"
+  },
+  
+  "OrdersPage": {
+    "title": "Order History",
+    "loading": "Loading...",
+    "error": "Error",
+    "fetchError": "Error loading orders",
+    "noOrders": "You have no orders yet",
+    "retry": "Retry",
+    "continueShopping": "Continue Shopping",
+    "orderCode": "Order Code",
+    "createdAt": "Created At",
+    "totalPrice": "Total Price",
+    "products": "Products",
+    "size": "Size",
+    "color": "Color",
+    "viewDetails": "View Details",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "canceled": "Canceled"
   }
+
+
 
 }

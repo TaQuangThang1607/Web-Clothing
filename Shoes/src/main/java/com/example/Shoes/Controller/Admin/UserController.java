@@ -25,6 +25,7 @@ import com.example.Shoes.Service.UserService;
 import com.example.Shoes.utils.PagedResponse;
 import com.example.Shoes.utils.error.IdInvalidException;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -53,7 +54,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(
+    public ResponseEntity<?> createUser(@Valid
         @RequestBody  UserDTO dto,
         BindingResult bindingResult
     ) throws IdInvalidException {
@@ -73,10 +74,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteUserById(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteUserById(@Valid @PathVariable Long id) {
         userService.deleteUser(id);
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Product deleted successfully");
+        response.put("message", "User deleted successfully");
         return ResponseEntity.ok(response);
     }
 
@@ -87,7 +88,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUserById(@Valid @PathVariable Long id) {
         UserDTO userDTO = userService.getUserById(id);
         if (userDTO == null) {
             return ResponseEntity.notFound().build();
@@ -100,7 +101,7 @@ public class UserController {
         @PathVariable Long id,
         @RequestBody UserDTO dto,
         BindingResult bindingResult
-    ) {
+    ) throws IdInvalidException {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest()
                     .body(getValidationErrors(bindingResult));

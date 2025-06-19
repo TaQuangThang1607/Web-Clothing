@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import axios from 'axios';
+import Header from '../components/Header';
 
 export default function ResetPasswordPage() {
   const t = useTranslations('common');
@@ -65,6 +66,8 @@ export default function ResetPasswordPage() {
   }
 
   return (
+    <>
+    <Header />
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md text-black">
       <h1 className="text-2xl font-bold mb-4">{t('resetPassword.title')}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -79,7 +82,7 @@ export default function ResetPasswordPage() {
             onChange={(e) => setNewPassword(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             required
-          />
+            />
         </div>
         <div>
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
@@ -92,18 +95,20 @@ export default function ResetPasswordPage() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             required
-          />
+            />
         </div>
         <button
           type="submit"
           className="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           disabled={newPassword !== confirmPassword}
-        >
+          >
           {t('resetPassword.submitButton')}
         </button>
         {message && <p className="mt-2 text-green-600">{message}</p>}
         {error && <p className="mt-2 text-red-600">{error}</p>}
       </form>
     </div>
+
+          </>
   );
 }

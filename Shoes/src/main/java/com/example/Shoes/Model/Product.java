@@ -1,8 +1,10 @@
 package com.example.Shoes.Model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -39,7 +41,6 @@ public class Product implements Serializable{
     private String size;
 
     @NotNull(message = "Color is required")
-    @Size(max = 50, message = "Color must be less than 10 characters")
     private String color;
 
     private String imageUrl;
@@ -55,4 +56,7 @@ public class Product implements Serializable{
 
     @OneToMany(mappedBy = "product")
     private List<CartDetail> cartDetails;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 }

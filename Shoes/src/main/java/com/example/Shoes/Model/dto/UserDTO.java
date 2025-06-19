@@ -1,10 +1,8 @@
 package com.example.Shoes.Model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -21,6 +19,7 @@ public class UserDTO {
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
+    @NotBlank(message = "Tên không được để trống")
     @Size(max = 100, message = "Full name must be less than 100 characters")
     private String fullName;
 
@@ -30,7 +29,5 @@ public class UserDTO {
     @Size(max = 200, message = "Address must be less than 200 characters")
     private String address;
 
-    @NotNull(message = "Role ID is required")
-    @JsonProperty("role")
     private Long roleId;
 }

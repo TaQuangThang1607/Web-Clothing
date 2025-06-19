@@ -7,11 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Shoes.Model.dto.order.OrderDTO;
+import com.example.Shoes.Model.dto.order.UpdateStatusRequest;
 import com.example.Shoes.Service.impl.AdminOrderServiceImpl;
 import com.example.Shoes.utils.PagedResponse;
 
@@ -53,5 +56,14 @@ public class AdminOrderController {
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
         OrderDTO order = adminOrderServiceImpl.getOrderById(orderId);
         return ResponseEntity.ok(order);
+    }
+
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<OrderDTO> updateOrderStatus(
+        @PathVariable Long orderId,
+        @RequestBody UpdateStatusRequest request) {
+        
+        OrderDTO updatedOrder = adminOrderServiceImpl.updateOrderStatus(orderId, request);
+        return ResponseEntity.ok(updatedOrder);
     }
 }

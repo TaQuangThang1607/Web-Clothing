@@ -1,5 +1,6 @@
 package com.example.Shoes.Model.dto;
 
+import com.example.Shoes.Model.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -22,8 +23,8 @@ public class RestLoginDTO {
         private long id;
         private String email;
         private String fullName;
-        private long roleId;
-        private String role;
+        private long role;
+    
     }
 
 

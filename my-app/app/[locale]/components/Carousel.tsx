@@ -4,7 +4,6 @@ import { FC, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 interface CarouselProps {
-  // Loại bỏ prop t vì tự quản lý trong component
 }
 
 const slides = [
@@ -84,7 +83,7 @@ const Carousel: FC<CarouselProps> = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
           <div className="absolute bottom-0 left-0 p-6 lg:p-10 text-white">
             <h2 className="text-3xl lg:text-5xl font-light mb-4 leading-tight">
-              {slide.title}
+              {t('stylish')}
             </h2>
             <a
               href="#"
@@ -109,13 +108,13 @@ const Carousel: FC<CarouselProps> = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-4 lg:p-6 text-white">
               <h2 className="text-2xl lg:text-3xl font-light mb-3 leading-tight">
-                {item.title} {/* Có thể thay bằng t('itemTitle') nếu muốn dịch */}
+                {t('sportsWear')}
               </h2>
               <a
                 href="#"
                 className="inline-block uppercase text-xs font-bold tracking-wider border-b border-white/50 pb-1 hover:border-white transition-colors duration-300"
               >
-                {t('shopNow')} {/* Dịch "Shop Now" */}
+                {t('shopNow')}
               </a>
             </div>
           </div>

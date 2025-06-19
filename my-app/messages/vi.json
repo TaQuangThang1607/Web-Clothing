@@ -44,6 +44,8 @@
     "login": "Đăng Nhập",
     "logout": "Đăng Xuất",
     "profile": "Hồ Sơ",
+    "pageAdmin": "Trang Quản Trị",
+    "pageHistory": "Lịch Sử Đơn Hàng",
     "language": "Ngôn Ngữ"
   },
   "User": {
@@ -73,6 +75,8 @@
   "view": "Xem",
   "added": "Đã thêm",
   "noDescription": "Không có mô tả",
+  "stylish": "Giày thời trang cho mọi người",
+  "sportsWear": "Thời trang thể thao",
   "shopNow": "Mua ngay",
   "details": "Chi tiết sản phẩm",
   "description": "Mô tả",
@@ -114,6 +118,87 @@
     "allProducts": "Tổng số sản phẩm",
     "price": "Giá",
     "noProductsFound": "Không tìm thấy sản phẩm phù hợp."
+  },
+   "Login": {
+    "title": "Đăng nhập thành viên",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Mật khẩu",
+    "submitButton": "Đăng nhập",
+    "forgot": "Quên",
+    "forgotLink": "Tên đăng nhập / Mật khẩu?",
+    "registerLink": "Tạo tài khoản →",
+    "errorUnknown": "Đã xảy ra lỗi không xác định"
+  },
+  "Register": {
+    "title": "Tạo tài khoản",
+    "fullNamePlaceholder": "Họ và tên",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Mật khẩu",
+    "repeatPasswordPlaceholder": "Nhập lại mật khẩu",
+    "button": "Đăng ký",
+    "loading": "Đang đăng ký...",
+    "success": "Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "errorDefault": "Đăng ký thất bại. Vui lòng thử lại.",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "signIn": "Đăng nhập"
+  },
+  
+  "OrderPage": {
+    "checkout": "Thanh toán",
+    "cartItems": "Sản phẩm trong giỏ hàng ({totalItems} sản phẩm)",
+    "shippingInfo": "Thông tin giao hàng",
+    "name": "Họ và tên",
+    "address": "Địa chỉ giao hàng",
+    "phone": "Số điện thoại",
+    "note": "Ghi chú (tùy chọn)",
+    "paymentMethod": "Phương thức thanh toán",
+    "cash": "Tiền mặt",
+    "card": "Thẻ tín dụng",
+    "transfer": "Chuyển khoản",
+    "complete": "Hoàn tất",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "emptyCart": "Giỏ hàng trống, vui lòng thêm sản phẩm trước khi thanh toán",
+    "fetchCartError": "Lỗi khi tải giỏ hàng",
+    "nameRequired": "Họ và tên là bắt buộc",
+    "nameMinLength": "Họ và tên phải có ít nhất 2 ký tự",
+    "addressRequired": "Địa chỉ là bắt buộc",
+    "addressMinLength": "Địa chỉ phải có ít nhất 5 ký tự",
+    "phoneRequired": "Số điện thoại là bắt buộc",
+    "phoneInvalid": "Số điện thoại không hợp lệ (ví dụ: +84912345678)",
+    "invalidForm": "Vui lòng kiểm tra và điền đầy đủ thông tin hợp lệ",
+    "emptyCartOrder": "Giỏ hàng trống, không thể tạo đơn hàng",
+    "orderSuccess": "Đơn hàng {orderCode} đã được tạo thành công!",
+    "orderError": "Lỗi khi tạo đơn hàng",
+    "continueShopping": "Tiếp tục mua sắm",
+    "size": "Kích cỡ",
+    "brand": "Thương hiệu",
+    "quantity": "Số lượng",
+    "total": "Tổng cộng"
+  },
+  
+  "OrdersPage": {
+    "title": "Lịch sử đơn hàng",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "fetchError": "Lỗi khi tải đơn hàng",
+    "noOrders": "Bạn chưa có đơn hàng nào",
+    "retry": "Thử lại",
+    "continueShopping": "Tiếp tục mua sắm",
+    "orderCode": "Mã đơn hàng",
+    "createdAt": "Ngày tạo",
+    "totalPrice": "Tổng giá",
+    "products": "Sản phẩm",
+    "size": "Kích cỡ",
+    "color": "Màu",
+    "viewDetails": "Xem chi tiết",
+    "pending": "Chờ xử lý",
+    "processing": "Đang xử lý",
+    "completed": "Hoàn thành",
+    "canceled": "Đã hủy"
   }
+
+
 
 }

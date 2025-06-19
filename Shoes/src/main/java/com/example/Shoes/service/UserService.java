@@ -20,7 +20,7 @@ public interface UserService {
     void updataUserToken(String token, String email);
 
     User getUserByRefreshTokenAndEmail(String token, String email);
-    UserDTO updateUser(Long id, UserDTO dto);
+    UserDTO updateUser(Long id, UserDTO dto)  throws IdInvalidException;
 
     void generateResetPasswordToken(String email) throws IdInvalidException;
     User verifyResetPasswordToken(String token) throws IdInvalidException;

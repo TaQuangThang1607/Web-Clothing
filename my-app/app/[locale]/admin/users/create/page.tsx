@@ -11,7 +11,7 @@ type CreateUserFormData = {
   fullName: string;
   phone: string;
   address: string;
-  roleId: number;
+  role: number;
 };
 
 export default function CreateUserPage() {
@@ -23,7 +23,7 @@ export default function CreateUserPage() {
     fullName: '',
     phone: '',
     address: '',
-    roleId: 2 // Mặc định là USER
+    role: 0
   });
 
   const [errors, setErrors] = useState<Partial<CreateUserFormData>>({});
@@ -78,7 +78,7 @@ export default function CreateUserPage() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'roleId' ? Number(value) : value,
+      [name]: name === 'role' ? Number(value) : value
     }));
     
     // Clear error khi người dùng bắt đầu nhập
@@ -103,7 +103,7 @@ export default function CreateUserPage() {
         fullName: formData.fullName,
         phone: formData.phone,
         address: formData.address,
-        roleId: formData.roleId
+        role: formData.role
       };
 
       await createUser(userToCreate);
@@ -225,20 +225,21 @@ export default function CreateUserPage() {
         
         {/* Role */}
         <div>
-          <label htmlFor="roleId" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
             Vai trò <span className="text-red-500">*</span>
           </label>
           <select
-            id="roleId"
-            name="roleId"
-            value={formData.roleId}
+            id="role"
+            name="role"
+            value={formData.role}
             onChange={handleChange}
-            className={`w-full p-2 border rounded ${errors.roleId ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full p-2 border rounded ${errors.role ? 'border-red-500' : 'border-gray-300'}`}
           >
-            <option value={2}>Người dùng (USER)</option>
             <option value={1}>Quản trị viên (ADMIN)</option>
+            <option value={2}>Người dùng (USER)</option>
           </select>
-          {errors.roleId && <p className="mt-1 text-sm text-red-600">{errors.roleId}</p>}
+          
+          {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
           <p className="mt-1 text-xs text-gray-500">
             ADMIN có toàn quyền truy cập hệ thống
           </p>

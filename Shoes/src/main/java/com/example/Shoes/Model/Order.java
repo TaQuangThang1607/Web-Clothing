@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.example.Shoes.Model.dto.order.OrderHistory;
+
 @Entity
 @Table(name = "orders")
 @Data
@@ -38,12 +40,15 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDetail> orderDetails;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderHistory> orderHistories;
+
     @CreationTimestamp
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
 
     @Version
-    private Long version; // Optimistic locking
+    private Long version;
 
     public void calculateTotalPrice() {
         this.totalPrice = orderDetails.stream()

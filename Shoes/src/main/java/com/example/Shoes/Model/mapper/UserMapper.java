@@ -13,10 +13,9 @@ import com.example.Shoes.Model.dto.UserDTO;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    @Mapping(target = "role", source = "roleId", qualifiedByName = "roleIdToRole")
+    @Mapping(source = "roleId", target = "roleId")
     User toEntity(UserDTO dto);
 
-    @Mapping(target = "roleId", source = "role.id")
     UserDTO toDto(User user);
 
     @Named("roleIdToRole")

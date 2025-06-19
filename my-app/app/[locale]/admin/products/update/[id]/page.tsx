@@ -1,4 +1,3 @@
-
 'use client';
 
 import { getProductById, updateProduct } from '@/app/[locale]/services/productService';
@@ -69,25 +68,14 @@ export default function UpdateProduct() {
     fetchProduct();
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    if (name === 'price') {
-      // Xử lý giá trị nhập vào
-      const cleanedValue = value.replace(/[^0-9]/g, ''); // Loại bỏ mọi ký tự không phải số
-      const numericValue = cleanedValue ? parseInt(cleanedValue, 10) : 0;
-      setFormData((prev) => ({
-        ...prev,
-        price: numericValue,
-      }));
-      setFormattedPrice(
-        numericValue.toLocaleString('vi-VN', { minimumFractionDigits: 0 })
-      );
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,16 +210,24 @@ export default function UpdateProduct() {
             />
           </div>
           <div>
-            <label htmlFor="brand" className="block text-sm font-medium text-gray-700">Thương hiệu <span className="text-red-500">*</span></label>
-            <input
-              type="text"
+            <label htmlFor="brand" className="block text-sm font-medium text-gray-700">
+              Thương hiệu <span className="text-red-500">*</span>
+            </label>
+            <select
               id="brand"
               name="brand"
               value={formData.brand}
               onChange={handleChange}
               className="mt-1 w-full border rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
               required
-            />
+            >
+              <option value="">Chọn thương hiệu</option>
+              <option value="Nike">Nike</option>
+              <option value="Converse">Converse</option>
+              <option value="Addidas">Addidas</option>
+              <option value="Jordan">Jordan</option>
+              <option value="Vans">Vans</option>
+            </select>
           </div>
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700">Giá <span className="text-red-500">*</span></label>
@@ -239,11 +235,9 @@ export default function UpdateProduct() {
               type="text"
               id="price"
               name="price"
-              value={formattedPrice}
+              value={formData.price.toLocaleString('vi-VN', { minimumFractionDigits: 0 })}
               onChange={handleChange}
-              className="mt-1 w-full border rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="0"
-              required
+              className="mt-1 w-full border rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"              required
             />
           </div>
           <div>

@@ -30,7 +30,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint{
             AuthenticationException authException) throws IOException, ServletException {
         
         if (request.getRequestURI().startsWith("/api/v1/auth/login")) {
-            return; // Để GlobalException xử lý lỗi
+            return;
         }
         
         this.point.commence(request, response, authException);

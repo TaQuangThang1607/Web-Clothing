@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { deleteUser } from "../services/userService";
 import { User } from "../types/user";
+import { useState } from "react";
 
 interface Props {
   users: User[];
@@ -10,21 +11,36 @@ interface Props {
 }
 
 export default function UserTable({ users, currentPage, totalPages, onPageChange }: Props) {
+  const [search, setSearch] = useState("");
 
-    const handleDelete = async (id: number) => {
-        if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-          try {
-            await deleteUser(id);
-            onPageChange(currentPage);
-            alert('Xóa sản phẩm thành công!');
-          } catch (error) {
-            alert('Lỗi khi xóa sản phẩm');
-          }
-        }
-      };
+  const handleDelete = async (id: number) => {
+    if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+      try {
+        await deleteUser(id);
+        onPageChange(currentPage);
+        alert('Xóa sản phẩm thành công!');
+      } catch (error) {
+        alert('Lỗi khi xóa sản phẩm');
+      }
+    }
+  };
 
-    return (
+  // Lọc user theo tên
+  const filteredUsers = users.filter(u =>
+    u.fullName?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
     <div>
+      <div className="mb-4 flex">
+        <input
+          type="text"
+          placeholder="Tìm kiếm tên người dùng..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="border p-2 rounded w-64 mr-2 text-black"
+        />
+      </div>
       <table className="w-full border-collapse border border-gray-300 text-black">
         <thead>
           <tr className="bg-gray-100">
@@ -37,7 +53,7 @@ export default function UserTable({ users, currentPage, totalPages, onPageChange
           </tr>
         </thead>
         <tbody>
-          {users.map(p => (
+          {filteredUsers.length > 0 ? filteredUsers.map(p => (
             <tr key={p.id}>
               <td className="border p-2">{p.id}</td>
               <td className="border p-2">{p.email}</td>
@@ -55,10 +71,12 @@ export default function UserTable({ users, currentPage, totalPages, onPageChange
                   Xóa
                 </button>
               </td>
-
-              
             </tr>
-          ))}
+          )) : (
+            <tr>
+              <td colSpan={6} className="text-center p-4">Không có người dùng nào.</td>
+            </tr>
+          )}
         </tbody>
       </table>
       <div className="mt-4 flex justify-center space-x-2">

@@ -19,7 +19,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
-          if (parsedUser && typeof parsedUser === 'object' && parsedUser.role === 'ADMIN') {
+          if (parsedUser && typeof parsedUser === 'object' && parsedUser.role === 1) { // Sửa thành số 1
             setUser(parsedUser);
           } else {
             router.push('/unauthorized');
@@ -33,18 +33,19 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       } else {
         router.push('/login');
       }
-    } else if (user?.role !== 'ADMIN') {
+    } else if (user?.role !== 1) {
       router.push('/unauthorized');
     }
-  }, [user, router]);
+  }, [user, router, setUser]);
 
   if (!isMounted) {
-    return null; // Hoặc loading spinner
+    return null;
   }
 
-  if (user?.role !== 'ADMIN') {
-    return null; // Đã xử lý chuyển hướng trong useEffect
+  if (user?.role !== 1) {
+    return null;
   }
+
 
   return (
     <div className="flex flex-col min-h-screen">

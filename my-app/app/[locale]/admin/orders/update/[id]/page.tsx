@@ -23,7 +23,7 @@ export default function UpdateOrderPage() {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (!user || user.role !== 'ADMIN') {
+    if (!user || user.role !== 1) {
       toast.error('Bạn không có quyền truy cập trang này');
       router.push('/unauthorized');
     }

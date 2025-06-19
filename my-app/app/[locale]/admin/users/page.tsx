@@ -32,9 +32,9 @@ export default function UserListPage() {
       }, [currentPage]);
 
         const handlePageChange = (newPage: number) => {
-            setCurrentPage(newPage);
-            router.push(`/admin/products?page=${newPage}`);
-        };
+        setCurrentPage(newPage);
+        router.push(`/admin/users?page=${newPage}`); // Sửa lại thành /admin/users
+    };
 
     return (
     <div className="container mx-auto p-6">

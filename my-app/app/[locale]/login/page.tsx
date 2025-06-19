@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "../context/UserContext";
 import { loginApi } from "../services/apiService";
 import Header from "../components/Header";
 import FooterPage from "../components/Footer";
+import { useLocale, useTranslations } from 'next-intl';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,9 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const { setUser } = useUser();
   const router = useRouter();
+
+  const t = useTranslations('Login');
+  const locale = useLocale();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,75 +29,73 @@ export default function LoginPage() {
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
 
-      if (user.roleId === 2) {
+      if (user.role === 2) {
         router.push('/');
       } else {
         router.push('/admin');
       }
     } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('An unknown error occurred');
-        }
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(t('errorUnknown'));
       }
-
+    }
   };
 
   return (
     <>
-    <Header />
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-lg shadow-md">
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            Member Login
-          </h2>
+      <Header />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-lg shadow-md">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <h2 className="text-center text-3xl font-extrabold text-gray-900">
+              {t('title')}
+            </h2>
 
-          <input 
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className="text-black w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-            required
-          />
+            <input 
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t('emailPlaceholder')}
+              className="text-black w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              required
+            />
 
-          <input 
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="text-black w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-            required
-          />
+            <input 
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={t('passwordPlaceholder')}
+              className="text-black w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              required
+            />
 
-          <button 
-            type="submit"
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Login
-          </button>
+            <button 
+              type="submit"
+              className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              {t('submitButton')}
+            </button>
 
-          {error && <p className="text-red-500 text-center">{error}</p>}
+            {error && <p className="text-red-500 text-center">{error}</p>}
 
-          <div className="text-center text-sm">
-            <span className="text-gray-600">Forgot</span>
-            <a href="/forgot-password" className="text-blue-600 hover:text-blue-500 ml-1">
-              Username / Password?
-            </a>
-          </div>
+            <div className="text-center text-sm">
+              <span className="text-gray-600">{t('forgot')}</span>
+              <a href="/forgot-password" className="text-blue-600 hover:text-blue-500 ml-1">
+                {t('forgotLink')}
+              </a>
+            </div>
 
-          <div className="text-center text-sm pt-4">
-            <a href="/register" className="text-blue-600 hover:text-blue-500">
-              Create your Account →
-            </a>
-          </div>
-        </form>
+            <div className="text-center text-sm pt-4">
+              <a href="/register" className="text-blue-600 hover:text-blue-500">
+                {t('registerLink')}
+              </a>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-    <FooterPage />
-        </>
-
+      <FooterPage />
+    </>
   );
 }

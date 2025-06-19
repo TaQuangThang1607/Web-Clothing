@@ -14,7 +14,7 @@ export default function UpdateUserPage() {
     fullName: '',
     phone: '',
     address: '',
-    roleId: 2 // Mặc định là USER
+    role: 2
   });
   
   const [errors, setErrors] = useState<Partial<User>>({});
@@ -32,7 +32,7 @@ export default function UpdateUserPage() {
           fullName: user.fullName,
           phone: user.phone,
           address: user.address,
-          roleId: user.roleId
+          role: user.role
         });
       } catch (err: any) {
         setApiError(err.message || 'Không thể tải thông tin người dùng.');
@@ -103,7 +103,7 @@ export default function UpdateUserPage() {
         fullName: formData.fullName,
         phone: formData.phone,
         address: formData.address,
-        roleId: formData.roleId
+        role: formData.role
       });
       setSuccessMessage('Cập nhật tài khoản thành công! Đang chuyển hướng...');
       setTimeout(() => {
@@ -187,15 +187,15 @@ export default function UpdateUserPage() {
             Vai trò <span className="text-red-500">*</span>
           </label>
           <select
-            name="roleId"
-            value={formData.roleId ?? 2}
+            name="role"
+            value={formData.role ?? 2}
             onChange={handleChange}
-            className={`w-full p-2 border rounded ${errors.roleId ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full p-2 border rounded ${errors.role ? 'border-red-500' : 'border-gray-300'}`}
           >
-            <option value={2}>Người dùng (USER)</option>
             <option value={1}>Quản trị viên (ADMIN)</option>
+            <option value={2}>Người dùng (USER)</option>
           </select>
-          {errors.roleId && <p className="mt-1 text-sm text-red-600">{errors.roleId}</p>}
+          {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
         </div>
 
         {/* Success Message */}

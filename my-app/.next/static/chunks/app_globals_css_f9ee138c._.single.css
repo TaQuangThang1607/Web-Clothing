@@ -490,10 +490,6 @@
     margin-top: calc(var(--spacing) * 14);
   }
 
-  .mr-1 {
-    margin-right: calc(var(--spacing) * 1);
-  }
-
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
   }
@@ -573,16 +569,8 @@
     display: none;
   }
 
-  .inline {
-    display: inline;
-  }
-
   .inline-block {
     display: inline-block;
-  }
-
-  .inline-flex {
-    display: inline-flex;
   }
 
   .h-2 {

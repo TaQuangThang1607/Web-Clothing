@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.Shoes.Model.Role;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Page<UserDTO> getAllUser(Pageable pageable) {
@@ -79,24 +81,32 @@ public class UserServiceImpl implements UserService{
         return this.userRepository.findByRefreshTokenAndEmail(token, email);
     }
 
-   @Override
-    public UserDTO updateUser(Long id, UserDTO dto) {
+    @Override
+    public UserDTO updateUser(Long id, UserDTO dto) throws IdInvalidException {
         User existingUser = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Kiểm tra nếu email thay đổi và không trùng với email hiện tại
+        if (dto.getEmail() != null && !dto.getEmail().equals(existingUser.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
+            throw new IdInvalidException("Email: " + dto.getEmail() + " đã tồn tại");
+        }
+
+        // Gán email mới nếu có
+        if (dto.getEmail() != null) {
+            existingUser.setEmail(dto.getEmail());
+        }
 
         existingUser.setFullName(dto.getFullName());
         existingUser.setPhone(dto.getPhone());
         existingUser.setAddress(dto.getAddress());
 
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-            existingUser.setPassword(dto.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
-        if (dto.getRoleId() != null) {
-            Role role = new Role();
-            role.setId(dto.getRoleId());
-            existingUser.setRole(role);
-        }
+        existingUser.setRoleId(dto.getRoleId());
+
+        
 
         User updatedUser = userRepository.save(existingUser);
         return userMapper.toDto(updatedUser);

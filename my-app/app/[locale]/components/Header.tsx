@@ -43,7 +43,7 @@ export default function Header() {
     router.push(`/${locale}`);
   };
 
-  const isAdmin = user?.roleId === 1;
+  const isAdmin = user?.role === 1;
 
   return (
     <header className="bg-white shadow sticky top-0 z-50">
@@ -115,27 +115,28 @@ export default function Header() {
                       href={`/${locale}/admin/products`}
                       className="block px-4 py-2 text-gray-900 hover:bg-gray-100"
                     >
-                      Trang quản trị
+                      {t("pageAdmin")}
                     </Link>
                   )}
                   <Link
                     href={`/${locale}/history`}
                     className="block px-4 py-2 text-gray-900 hover:bg-gray-100"
                   >
-                    Lịch sử đơn hàng
+                    {t("pageHistory")}
                   </Link>
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
                   >
-                    Đăng xuất
+                    {t("logout")}
                   </button>
                 </div>
               )}
             </div>
           ) : (
             <Link href={`/${locale}/login`} className="text-gray-700 hover:text-blue-600">
-              Đăng nhập
+              
+              {t("login")}
             </Link>
           )}
 

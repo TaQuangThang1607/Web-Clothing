@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import axios from 'axios';
+import FooterPage from '../components/Footer';
+import Header from '../components/Header';
 
 export default function ForgotPasswordPage() {
   const t = useTranslations('common');
@@ -34,6 +36,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
+    <>
+    <Header />
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md text-black">
       <h1 className="text-2xl font-bold mb-4">{t('forgotPassword.title')}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -65,5 +69,6 @@ export default function ForgotPasswordPage() {
         </a>
       </p>
     </div>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { fetchWithTokenRefresh } from './apiService';
 import { User } from '../types/user';
 
-const API_URL = 'http://localhost:8080/api/v1/users';
+const API_URL = 'http://localhost:8080/admin/users';
 
 interface UserListResponse {
   content: User[];

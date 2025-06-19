@@ -52,7 +52,7 @@ public class SecurityConfig {
                 "/api/products",
                 "/api/products/**",
                 "/api/register",
-                "api/products/**",
+                "/api/products/**",
                 "/api/v1/auth/forgot-password",
                 "/api/v1/auth/reset-password",
                 "/api/cart/",

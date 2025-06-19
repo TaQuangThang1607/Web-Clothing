@@ -49,7 +49,10 @@ export default function ProductDetailClientPage() {
     if (locale === 'vi') {
       return price.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) + ' VND';
     }
-    return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 0 });
+    // Chuyển đổi từ VND sang USD (1 USD = 26.100 VND)
+    const exchangeRate = 26100;
+    const priceInUSD = price / exchangeRate;
+    return '$' + priceInUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   if (loading) {

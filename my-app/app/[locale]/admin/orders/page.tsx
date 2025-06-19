@@ -47,15 +47,28 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     setIsMounted(true);
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (!user || user.role !== 'ADMIN') {
-      toast.error('Bạn không có quyền truy cập trang này');
-      router.push('/unauthorized');
+    try {
+      const userStr = localStorage.getItem('user');
+      if (!userStr) {
+        throw new Error('User not found');
+      }
+      
+      const user = JSON.parse(userStr);
+      if (!user || user.role !== 1) {
+        throw new Error('Unauthorized');
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+      toast.error('Bạn cần đăng nhập với quyền ADMIN để truy cập trang này');
+      localStorage.removeItem('user');
+      localStorage.removeItem('access_token');
+      router.push('/login');
     }
   }, [router]);
 
   const fetchOrders = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await getAllOrdersApi(
         currentPage,
@@ -65,13 +78,18 @@ export default function AdminOrdersPage() {
         startDate,
         endDate
       );
+      
+      if (!response || !Array.isArray(response.content)) {
+        throw new Error('Dữ liệu đơn hàng không hợp lệ');
+      }
+      
       setOrders(response.content);
       setTotalPages(response.totalPages);
       setCurrentPage(response.page);
-      setError(null);
     } catch (err: any) {
-      setError(err.message || 'Lỗi khi tải danh sách đơn hàng');
-      toast.error(err.message || 'Lỗi khi tải danh sách đơn hàng');
+      const errorMsg = err.message || 'Lỗi khi tải danh sách đơn hàng';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
